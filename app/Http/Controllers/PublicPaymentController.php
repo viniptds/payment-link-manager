@@ -81,12 +81,13 @@ class PublicPaymentController extends Controller
             $cieloHelper->setCustomer($card['holder']);
 
             $cieloHelper->setPayment($payment->value, $data['payment_installments']);
-            
+
             $sale = $cieloHelper->makeCreditCardPayment($card);
             $cieloPayment = $sale->getPayment();
             $returnCode = $cieloPayment->getReturnCode();
+            $status = $cieloPayment->getStatus();
             
-            if ($returnCode == 4 || $returnCode == 6) { // Check the API to compare
+            if ($status == 2 && $returnCode == '00') {
                 Log::debug(json_encode($cieloPayment));
                 $payment->transaction_log = json_encode($cieloPayment);
                 $payment->status = Payment::STATUS_PAID;
@@ -95,7 +96,9 @@ class PublicPaymentController extends Controller
 
                 return redirect('pay/' . $payment->id . '/receipt')->with('receiptMessage', 'O pagamento foi realizado com sucesso!');
             } else {
+                Log::debug('Payment Id: ' . $payment->id);
                 Log::debug('Return Code: ' . $returnCode);
+                Log::debug('Payment Status: ' . $status);
                 $response = CieloGatewayHelper::getReturnMessageByCode($returnCode);
             }
         }

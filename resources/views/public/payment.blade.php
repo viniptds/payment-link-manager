@@ -94,6 +94,10 @@ $page = $_GET['page'] ?? 'home';
                         <label class="label-control">CPF</label>
                         <input class="form-control" type="text" name="cpf" id="payment-document" placeholder="000.000.000-00" value="{{old('cpf') ?? $customer->cpf ?? ''}}">
                     </div>
+                    <div class="my-4">
+                        <label class="label-control">Nº OAB</label>
+                        <input class="form-control" type="text" name="document" id="payment-document" placeholder="00000" maxlength=7 value="{{old('document') ?? $customer->document ?? ''}}">
+                    </div>
                     <!-- <div class="my-4">
                         <label>Documento</label>
                         <input type="text" name="document" id="payment-document" placeholder="OA">

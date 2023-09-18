@@ -7,10 +7,9 @@ use Illuminate\Http\Request;
 
 class CustomerController extends Controller
 {
-    //
     function index()
     {
-        $customers = Customer::all();
+        $customers = Customer::select()->orderByDesc('created_at')->get();
         return view('customers.index')->with('customers', $customers);
     }
 

@@ -11,7 +11,7 @@ $parseStatus = [
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Link de Pagamento - ' . $payment->id ) }}
+            {{ __('Cliente - ' . $customer->name ) }}
         </h2>
     </x-slot>
 
@@ -24,28 +24,6 @@ $parseStatus = [
 
             </div>
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-5">
-                <p>Id: {{$payment->id}}</p>
-
-                <p>Status: {{ __('payments.status.' . $payment->status)}}</p>
-
-                @if($payment->paid_at)
-                <p>Pago em: {{ $payment->paid_at ? date("H:i:s d/m/Y", strtotime($payment->paid_at)) : '-'}}</p>
-                @endif
-
-                @if($payment->cancelled_at)
-                <p>Cancelado em: {{ $payment->cancelled_at ? date("H:i:s d/m/Y", strtotime($payment->cancelled_at)) : '-'}}</p>
-                @endif
-
-                @if($payment->expire_at)
-                <p>Expira em: {{ $payment->expire_at ? date("H:i:s d/m/Y", strtotime($payment->expire_at)) : '-'}}</p>
-                @endif
-
-                <p>Descrição: {{$payment->description}}</p>
-
-                @if ($payment->status == 'paid')
-                <!-- TODO: Mostra o cupom/comprovante -->
-                @endif
-
                 <table id="links_table">
                     <thead class="py-5">
                         <th>Link</th>

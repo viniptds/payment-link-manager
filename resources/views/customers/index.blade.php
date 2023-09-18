@@ -23,14 +23,15 @@ $hasMorePages = false;
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
           
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-5">
-                <table id="links_table">
+                <table id="links_table" class="w-full">
                     <thead class="py-5">
                         <th class="">ID</th>
                         <th class="">Nome</th>
                         <th class="">Email</th>
                         <th class="">CPF</th>
+                        <th class="">Nº OAB</th>
                         <th class="">Criado Em</th>
-                        <th>Ações</th>
+                        <!-- <th>Ações</th> -->
                     </thead>
                     <tbody>
                         @foreach ($customers as $customer)
@@ -40,9 +41,10 @@ $hasMorePages = false;
                             <td>{{ $customer->name }}
                             <td>{{ $customer->email }}
                             <td>{{ $customer->cpf }}
+                            <td>{{ $customer->document ?? '' }}
                             
-                            <td>{{ date('H:i:s d/m/Y', strtotime($customer->created_at)) }}</td>
-                            <td><a href="{{url('/customers/' . $customer->id )}}">Ver</a>
+                            <td>{{ date('d/m/Y H:i:s', strtotime($customer->created_at)) }}</td>
+                            <!-- <td><a href="{{url('/customers/' . $customer->id )}}">Ver</a> -->
                             </td>
                         </tr>
                         @endforeach
