@@ -32,4 +32,14 @@ class CieloWebhookController extends Controller
         // Temporary response
         return response('', 200);
     }
+
+    public function returnHook(Request $request)
+    {
+        Log::debug('WEBHOOK - Return');
+        Log::info(json_encode($request->post()));
+        
+        // Temporary response
+        return response('', 200);
+    }
+    
 }

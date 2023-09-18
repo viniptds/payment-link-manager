@@ -43,7 +43,11 @@ $hasMorePages = false;
                     <tbody>
                         @foreach ($links as $payment)
                         <tr class="p-5 m-10"> 
-                            <td><a href="{{url('/pay') . '/' . $payment->id}}" target="_blank"> {{ $payment->id }}</a>
+                            <td>
+                              <div class="flex justify-between">
+                                <a href="{{url('/pay') . '/' . $payment->id}}" target="_blank"> {{ $payment->id }}</a> 
+                                <button type="button" class="btn-copy btn btn-blue mr-3" data-content="{{url('/pay') . '/' . $payment->id}}">Copiar</button>
+                              </div>
                             <td>{{ $payment->description }}
                             <td>R$ {{ str_replace('.', ',', sprintf ("%.2f", $payment->value)) }}</td>
                             <td>{{ __('payments.status.' . $payment->status) }}</td>
@@ -182,24 +186,24 @@ $hasMorePages = false;
 
 @section('js')
 <script>
-    function sendLink(evt){
-        evt.preventDefault();
+    document.querySelectorAll('.btn-copy').forEach((item) => {
+      item.addEventListener('click', function (evt) {
+        let content = evt.target.dataset.content;
+        navigator.clipboard.writeText(content);
 
-        let description = document.querySelector('#descriptionInput');
-        let value = document.querySelector('#valueInput');
-        let expireAt = document.querySelector('#expireAtInput');
-        let data = [
-            description,
-            value,
-            expireAt
-        ]
-        // fetch(action, data)
-        // .then((res) => {
+        let target = evt.target;
+        target.classList.add('btn-success');
+        target.classList.remove('btn-blue');
 
-        // })
+        setTimeout(() => returnCopied(target), 3000);
+      })
+    });
+
+    function returnCopied(element)
+    {
+      element.classList.add('btn-blue');
+      element.classList.remove('btn-success');
     }
-    // document.querySelector('#submitCreateLink').addEventListener('click', function (evt) { alert('aa'); sendLink(evt)});
-    // document.querySelector('#submitCreateLink').onclick = function (evt) { alert('aa'); sendLink(evt)};
 </script>
 @endsection
 </x-app-layout>

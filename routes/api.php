@@ -15,8 +15,8 @@ use App\Http\Controllers\CieloWebhookController;
 |
 */
 
+Route::post('cielo/return', [CieloWebhookController::class, 'returnHook']);
 Route::post('cielo/notification', [CieloWebhookController::class, 'notification']);
-
 Route::post('cielo/change-status', [CieloWebhookController::class, 'changeStatus']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
