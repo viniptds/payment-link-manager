@@ -34,5 +34,8 @@ jobs:
         rsync -avz --delete --exclude-from=".rsyncignore" -e "ssh -i ~/.ssh/id_rsa" ./ ubuntu@${{ secrets.EC2_PUBLIC_IP }}:/var/www/html
         ssh -i ~/.ssh/id_rsa ubuntu@${{ secrets.EC2_PUBLIC_IP }} 'cd /var/www/html && composer install --no-interaction --prefer-dist --optimize-autoloader && php artisan migrate --force'
 
+    - name: Set file permissions
+      run: chmod -R ugo+rw storage/logs && chmod -R ugo+rw storage/framework
+    
     - name: Clear SSH key
       run: rm ~/.ssh/id_rsa
