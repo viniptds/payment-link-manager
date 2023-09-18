@@ -38,20 +38,22 @@ class CieloGatewayHelper {
     function setPayment($value, $installments = 1)
     {
         if (!empty($value) && $installments > 0 && $installments <= $this->maxInstallments) {
-            $this->sale->payment($value, $installments);
+            $this->sale->payment($value * 100, $installments);
         }
         
     }
 
     function makeCreditCardPayment($creditCard)
     {
+        $softDescriptor = 'OABCEARA';
         // Crie uma instância de Credit Card utilizando os dados de teste
         // esses dados estão disponíveis no manual de integração.
         $this->sale->getPayment()->setType(Payment::PAYMENTTYPE_CREDITCARD)
         ->creditCard($creditCard['cvv'], $creditCard['brand'])
         ->setExpirationDate($creditCard['expiration_date'])
         ->setCardNumber($creditCard['number'])
-        ->setHolder($creditCard['holder']);
+        ->setHolder($creditCard['holder'])
+        ->setSoftDescriptor($softDescriptor);
 
         // Crie o pagamento na Cielo
         try {
@@ -65,6 +67,8 @@ class CieloGatewayHelper {
             // Em caso de erros de integração, podemos tratar o erro aqui.
             // os códigos de erro estão todos disponíveis no manual de integração.
             $error = $e->getCieloError();
+            Log::error($error);
+            Log::debug(json_encode($e));
             var_dump($e);
             var_dump($error);
         }
@@ -86,6 +90,21 @@ class CieloGatewayHelper {
         } catch(CieloRequestException $e) {
             $error = $e->getCieloError();
         }
+    }
+
+    public static function getReturnMessageByCode($responseCode)
+    {
+        $defaultMessage = 'Falha no pagamento. Tente novamente em alguns instantes';
+        $responseMessages = [
+            '05' => 'Pagamento não autorizado',
+            '57' => 'Cartão expirado',
+            '78' => 'Cartão bloqueado',
+            '99' => 'Timeout',
+            '77' => 'Cartão Cancelado',
+            '70' => 'Problemas com o Cartão de Crédito',
+        ];
+
+        return $responseMessages[$responseCode] ?? $defaultMessage;
     }
 
     public static function getAvailableBrands()

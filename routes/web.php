@@ -24,7 +24,7 @@ Route::get('/', function () {
 });
 
 Route::prefix('pay')->group(function() {
-    Route::get('/{payment}', [PublicPaymentController::class, 'show']);
+    Route::get('/{payment}', [PublicPaymentController::class, 'show'])->name('public.payment');
     Route::post('/{payment}/personal', [PublicPaymentController::class, 'personal']);
     Route::post('/{payment}/checkout', [PublicPaymentController::class, 'checkout']);
     Route::get('/{payment}/receipt', [PublicPaymentController::class, 'receipt']);

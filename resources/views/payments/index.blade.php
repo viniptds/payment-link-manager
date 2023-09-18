@@ -7,7 +7,7 @@ $hasMorePages = false;
 <x-app-layout>
     <x-slot name="header">
       <div class="flex justify-between">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight content-center flex flex-wrap">
             {{ __('Links') }}
         </h2>
         <button class="btn btn-blue text-lg font-bold "
@@ -16,12 +16,21 @@ $hasMorePages = false;
                 data-te-ripple-init
                 data-te-ripple-color="light">Novo Link de Pagamento</button>
       </div>
+      @if($errors->all())
+      <div>
+        <ul>
+        @foreach ($errors->all() as $error)
+          <li>{{$error}}</li>
+        @endforeach
+        </ul>
+      </div>
+      @endif
     </x-slot>
 
     <div class="py-5">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-7lg mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-5">
-                <table id="links_table">
+                <table id="links_table" class="w-full">
                     <thead class="py-5">
                         <th class="">Link</th>
                         <th class="">Descrição</th>
@@ -36,20 +45,16 @@ $hasMorePages = false;
                         <tr class="p-5 m-10"> 
                             <td><a href="{{url('/pay') . '/' . $payment->id}}" target="_blank"> {{ $payment->id }}</a>
                             <td>{{ $payment->description }}
-                            <td>R$ {{ str_replace('.', ',', $payment->value) }}
-                            <td>{{ __('payments.status.' . $payment->status) }}
-                            <td>{{ date('H:i:s d/m/Y', strtotime($payment->created_at)) }}</td>
+                            <td>R$ {{ str_replace('.', ',', sprintf ("%.2f", $payment->value)) }}</td>
+                            <td>{{ __('payments.status.' . $payment->status) }}</td>
+                            <td>{{ date('d/m/Y H:i:s', strtotime($payment->created_at)) }}</td>
                             <td><a href="{{url('/payments/' . $payment->id )}}">Ver</a> | 
                               @if(in_array($payment->status, ['active', 'inactive'])) 
-                              <a href="{{url('/payments/' . $payment->id . '/toggle-active')}}"> {{ $payment->status == 'active' ? 'Desativar' : 'Ativar'}} </a> | 
+                              <a href="{{url('/payments/' . $payment->id . '/toggle-active')}}"> {{ $payment->status == 'active' ? 'Desativar' : 'Ativar'}} </a>
                               @endif
                               <!-- @if ($payment->status == 'cancelled')
                               <a href="{{url('/payments/' . $payment->id . '/delete')}}"> Remover</a> | 
                               @endif -->
-
-                              @if ($payment->status == 'active')
-                              <a href="{{url('/payments/' . $payment->id . '/mark-as-paid')}}"> Marcar como Pago </a> | 
-                              @endif
                             </td>
                         </tr>
                         @endforeach
@@ -131,42 +136,46 @@ $hasMorePages = false;
           </svg>
         </button>
       </div>
+      <form method="POST" action="payments">
+        <!--Modal body-->
+        <div class="relative flex-auto p-4" data-te-modal-body-ref>
+          
+              @csrf
+              <div class="">
+                <label for="valueInput" >Valor de Pagamento</label>
+                <input class='form-control' id='valueInput' name='value' type="number" step="0.01" required>
+              </div>
+              <div class="">
+                <label>Descrição</label>
+                <input class="form-control" name='description' id='descriptionInput' type="text" maxlength='100' required>
+              </div>
+              <div class="">
+                <label>Válido até</label>
+                <input class="form-control" name='expire_at' id='expireAtInput' type="datetime-local">
+              </div>
+        </div>  
 
-      <!--Modal body-->
-      <div class="relative flex-auto p-4" data-te-modal-body-ref>
-        <form method="POST" action="payments">
-            @csrf
-
-            <label for="valueInput" >Valor de Pagamento</label>
-            <input class='form-control' id='valueInput' name='value' type="number" step="0.01">
-            <label>Descrição</label>
-            <input name='description' id='descriptionInput' type="text" maxlength='100'>
-            <label>Válido até</label>
-            <input name='expire_at' id='expireAtInput' type="datetime-local">
-            <button type="submit" id="submitCreateLink"></button>
-        </form>
-      </div>
-
-      <!--Modal footer-->
-      <div
-        class="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
-        <button
-          type="button"
-          class="inline-block rounded bg-primary-100 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-primary-700 transition duration-150 ease-in-out hover:bg-primary-accent-100 focus:bg-primary-accent-100 focus:outline-none focus:ring-0 active:bg-primary-accent-200"
-          data-te-modal-dismiss
-          data-te-ripple-init
-          data-te-ripple-color="light">
-          Close
-        </button>
-        <button
-          type="button"
-          class="ml-1 inline-block rounded bg-primary px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_#3b71ca] transition duration-150 ease-in-out hover:bg-primary-600 hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:bg-primary-600 focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:outline-none focus:ring-0 active:bg-primary-700 active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] dark:shadow-[0_4px_9px_-4px_rgba(59,113,202,0.5)] dark:hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)]"
-          data-te-ripple-init
-          data-te-ripple-color="light"
-            id='submitCreateLink' >
-          Criar Link
-        </button>
-      </div>
+        <!--Modal footer-->
+        <div
+          class="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
+          <button
+            type="button"
+            class="inline-block rounded bg-primary-100 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-primary-700 transition duration-150 ease-in-out hover:bg-primary-accent-100 focus:bg-primary-accent-100 focus:outline-none focus:ring-0 active:bg-primary-accent-200"
+            data-te-modal-dismiss
+            data-te-ripple-init
+            data-te-ripple-color="light">
+            Close
+          </button>
+          <button
+            type="submit"
+            class="btn btn-blue ml-1 inline-block rounded bg-primary  font-medium leading-normal "
+            data-te-ripple-init
+            data-te-ripple-color="light"
+              id='submitCreateLink' >
+            Criar Link
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
@@ -174,9 +183,6 @@ $hasMorePages = false;
 @section('js')
 <script>
     function sendLink(evt){
-        console.log(evt);
-        let action = evt.target.form.action;
-        console.log(evt, action);
         evt.preventDefault();
 
         let description = document.querySelector('#descriptionInput');
@@ -187,13 +193,13 @@ $hasMorePages = false;
             value,
             expireAt
         ]
-        fetch(action, data)
-        .then((res) => {
+        // fetch(action, data)
+        // .then((res) => {
 
-        })
+        // })
     }
     // document.querySelector('#submitCreateLink').addEventListener('click', function (evt) { alert('aa'); sendLink(evt)});
-    document.querySelector('#submitCreateLink').onclick = function (evt) { alert('aa'); sendLink(evt)};
+    // document.querySelector('#submitCreateLink').onclick = function (evt) { alert('aa'); sendLink(evt)};
 </script>
 @endsection
 </x-app-layout>

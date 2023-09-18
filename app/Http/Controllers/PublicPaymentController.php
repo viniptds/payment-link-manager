@@ -24,7 +24,7 @@ class PublicPaymentController extends Controller
         $request->validate([
             'email' => 'required',
             'name' => 'required',
-            'cpf' => 'required',
+            'cpf' => 'required|cpf',
             'document' => 'nullable',
             'customer_id' => 'nullable|exists:customers,id'
         ]);
@@ -58,12 +58,13 @@ class PublicPaymentController extends Controller
             'card_brand' => 'required',
             'card_expiration_date' => 'required|after_or_equal:now',
             'card_cvv' => 'required|integer|min_digits:3|max_digits:3',
-            'payment_installments' => 'required'
+            'payment_installments' => 'required',
+            'customer_id' => 'required|exists:customers,id'
         ]);
 
         if ($payment->status != Payment::STATUS_ACTIVE) {
             $response = 'Este link não é válido.';
-        } elseif($payment->expire_at < date('Y-m-d H:i:s')) {
+        } elseif(!is_null($payment->expire_at) && $payment->expire_at < date('Y-m-d H:i:s')) {
             $response = 'Este link expirou.';
         } else {
             $data = $request->post();
@@ -79,25 +80,27 @@ class PublicPaymentController extends Controller
             $cieloHelper = new CieloGatewayHelper($payment->id);
             $cieloHelper->setCustomer($card['holder']);
 
-            $cieloHelper->setPayment($payment->value * 100, $data['payment_installments']);
+            $cieloHelper->setPayment($payment->value, $data['payment_installments']);
             
             $sale = $cieloHelper->makeCreditCardPayment($card);
             $cieloPayment = $sale->getPayment();
+            $returnCode = $cieloPayment->getReturnCode();
             
-            if ($cieloPayment->returnCode == '4/6') { // Check the API to compare
+            if ($returnCode == 4 || $returnCode == 6) { // Check the API to compare
                 Log::debug(json_encode($cieloPayment));
                 $payment->transaction_log = json_encode($cieloPayment);
                 $payment->status = Payment::STATUS_PAID;
                 $payment->paid_at = date('Y-m-d H:i:s');
                 $payment->save();
 
-                return redirect('pay/' . $payment->id . '/receipt');
+                return redirect('pay/' . $payment->id . '/receipt')->with('receiptMessage', 'O pagamento foi realizado com sucesso!');
             } else {
-                $response = 'O cartão não é válido';
+                Log::debug('Return Code: ' . $returnCode);
+                $response = CieloGatewayHelper::getReturnMessageByCode($returnCode);
             }
         }
 
-        return redirect('pay/' . $payment->id)->with('errors', $response);
+        return redirect('pay/' . $payment->id . "?page=card")->with('cardMessage', $response);
         
     }
     

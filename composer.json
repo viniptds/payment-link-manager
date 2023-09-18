@@ -10,7 +10,8 @@
         "idealizetecnologia/api-3.0-php": "^1.0",
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.2",
-        "laravel/tinker": "^2.8"
+        "laravel/tinker": "^2.8",
+        "laravellegends/pt-br-validator": "^10.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",

@@ -15,16 +15,15 @@ $parseStatus = [
         </h2>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-5">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="flex pb-5">
-
-                <a class="btn btn-blue" href="{{url('/payments')}}">Voltar para Pagamentos</a>
-                <h1 class="text-lg font-bold ">Informações do Link</h1>
+            <div class="flex flex-col pb-5">
+                <p><a class="btn btn-blue" href="{{url('/payments')}}">Voltar para Pagamentos</a></p>
+                <h1 class="text-lg font-bold pt-10">Informações do Link</h1>
 
             </div>
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-5">
-                <p>Id: {{$payment->id}}</p>
+                <p>Link: <a href="{{url('pay/' . $payment->id)}}">{{url('pay/' . $payment->id)}}</a></p>
 
                 <p>Status: {{ __('payments.status.' . $payment->status)}}</p>
 
@@ -42,13 +41,19 @@ $parseStatus = [
 
                 <p>Descrição: {{$payment->description}}</p>
 
+                @if ($payment->status == 'active')
+                <div class="my-5">
+                  <a class="btn btn-blue" href="{{url('/payments/' . $payment->id . '/mark-as-paid')}}"> Marcar como Pago </a>
+                </div>
+                @endif
                 @if ($payment->status == 'paid')
                 <!-- TODO: Mostra o cupom/comprovante -->
                 @endif
-                <br>
-                <br>
+
+                @if ($payment->transaction_log ?? false)
                 <p>Logs da transação:</p>
                 {{$payment->transaction_log}}
+                @endif
             </div>
         </div>
     </div>

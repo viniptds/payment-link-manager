@@ -1,42 +1,42 @@
 <?php
 $customer = $payment->customer;
+$page = $_GET['page'] ?? 'home';
 ?>
 <x-guest-layout>
   @if($payment->status == 'active')
-    <div class="py-5">
+    <div class="py-5 mb-5">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="flex justify-items-center pb-5">
-                <h1 class="text-lg font-bold ">Pagamento por Cartão de Crédito</h1>
+            <div class="flex justify-center pb-5">
+                <h1 class="text-bold text-2xl">Pagamento por Cartão de Crédito</h1>
             </div>
             <div class="tab-header">
-
                 <ul
                 class="mb-5 flex list-none flex-row flex-wrap border-b-0 pl-0"
                 role="tablist"
                 data-te-nav-ref>
                 <li role="presentation" class="flex-grow basis-0 text-center">
                     <a
-                    class="cursor-pointer my-2 block border-x-0 border-b-2 border-t-0 border-transparent px-7 pb-3.5 pt-4 text-xs font-medium uppercase leading-tight text-neutral-500 hover:isolate hover:border-transparent hover:bg-neutral-100 focus:isolate focus:border-transparent data-[te-nav-active]:border-primary data-[te-nav-active]:text-primary dark:text-neutral-400 dark:hover:bg-transparent dark:data-[te-nav-active]:border-primary-400 dark:data-[te-nav-active]:text-primary-400"
-                    onclick="setTab('tab-home')"
-                    >Resumo de Checkout</a
-                    >
+                    class="cursor-pointer my-2 block border-x-0 border-b-2 border-t-0 border-transparent px-7 pb-3.5 pt-4 text-xs font-medium uppercase leading-tight text-neutral-500 hover:isolate hover:border-transparent hover:bg-neutral-100 focus:isolate focus:border-transparent data-[te-nav-active]:border-primary data-[te-nav-active]:text-primary dark:text-neutral-400 dark:hover:bg-transparent dark:data-[te-nav-active]:border-primary-400 dark:data-[te-nav-active]:text-primary-400 {{$page == 'home' ? 'shadow-[0_4px_9px_-4px_#3b71ca]' : ''}}"
+                    onclick="setTab('home')">
+                    Resumo de Checkout
+                    </a>
                 </li>
                 <li role="presentation" class="flex-grow basis-0 text-center">
                     <a
-                    class="cursor-pointer my-2 block border-x-0 border-b-2 border-t-0 border-transparent px-7 pb-3.5 pt-4 text-xs font-medium uppercase leading-tight text-neutral-500 hover:isolate hover:border-transparent hover:bg-neutral-100 focus:isolate focus:border-transparent data-[te-nav-active]:border-primary data-[te-nav-active]:text-primary dark:text-neutral-400 dark:hover:bg-transparent dark:data-[te-nav-active]:border-primary-400 dark:data-[te-nav-active]:text-primary-400"
-                    onclick="setTab('tab-personal')"
+                    class="cursor-pointer my-2 block border-x-0 border-b-2 border-t-0 border-transparent px-7 pb-3.5 pt-4 text-xs font-medium uppercase leading-tight text-neutral-500 hover:isolate hover:border-transparent hover:bg-neutral-100 focus:isolate focus:border-transparent data-[te-nav-active]:border-primary data-[te-nav-active]:text-primary dark:text-neutral-400 dark:hover:bg-transparent dark:data-[te-nav-active]:border-primary-400 dark:data-[te-nav-active]:text-primary-400 {{$page == 'personal' ? 'shadow-[0_4px_9px_-4px_#3b71ca]' : ''}}" 
+                    onclick="setTab('personal')"
                     >Dados Pessoais</a
                     >
                 </li>
                 <li role="presentation" class="flex-grow basis-0 text-center">
                     <a
-                    class="cursor-pointer my-2 block border-x-0 border-b-2 border-t-0 border-transparent px-7 pb-3.5 pt-4 text-xs font-medium uppercase leading-tight text-neutral-500 hover:isolate hover:border-transparent hover:bg-neutral-100 focus:isolate focus:border-transparent data-[te-nav-active]:border-primary data-[te-nav-active]:text-primary dark:text-neutral-400 dark:hover:bg-transparent dark:data-[te-nav-active]:border-primary-400 dark:data-[te-nav-active]:text-primary-400"
-                    onclick="setTab('tab-card')"
+                    class="cursor-pointer my-2 block border-x-0 border-b-2 border-t-0 border-transparent px-7 pb-3.5 pt-4 text-xs font-medium uppercase leading-tight text-neutral-500 hover:isolate hover:border-transparent hover:bg-neutral-100 focus:isolate focus:border-transparent data-[te-nav-active]:border-primary data-[te-nav-active]:text-primary dark:text-neutral-400 dark:hover:bg-transparent dark:data-[te-nav-active]:border-primary-400 dark:data-[te-nav-active]:text-primary-400 {{$page == 'card' ? 'shadow-[0_4px_9px_-4px_#3b71ca]' : ''}}"
+                    onclick="setTab('card')"
                     >Dados do Cartão</a
                     >
                 </li>
                 </ul>
-                @if($errors->any())
+                @if($errors->all() ?? false)
                     <div class="bg-red">
                         <ul>
                             @foreach ($errors->all() as $error)
@@ -48,23 +48,27 @@ $customer = $payment->customer;
             </div>
             <div class="tab-body">
                 <div
-                class="tab-panel hidden opacity-100 transition-opacity duration-150 ease-linear data-[te-tab-active]:block"
+                class="tab-panel hidden opacity-0 transition-opacity duration-150 ease-linear data-[te-tab-active]:block"
                 id="tab-home"
                 role="tabpanel"
-                aria-labelledby="tab-home-tab"
-                data-te-tab-active>
+                aria-labelledby="tab-home-tab">
+                    <h1 class="text-bold text-xl">Resumo do Checkout</h1>
                     <div class="my-4">
-                    Vendido por: <b>{{env('APP_NAME')}}</b>
+                        <label class="label-control">Recebedor</label> 
+                        <input class="form-control" readonly value="{{env('APP_NAME')}}">
                     </div>
 
                     <div class="my-4">
-                        Item: {{$payment->description}}
+                        <label class="label-control">Item</label> 
+                        <input class="form-control" readonly value="{{$payment->description}}">
                     </div>
+
                     <div class="my-4">
-                    Valor: <b>R$ {{$payment->value}}</b>
+                        <label class="label-control">Valor</label> 
+                        <input class="form-control" readonly value='R$ {{str_replace(".", ",", sprintf("%.2f", $payment->value))}}'>
                     </div>
-                    <div class="flex bg-white overflow-hidden sm:rounded-lg justify-end ">
-                    <a class="btn btn-blue" id="nextPage" onclick="setTab('tab-personal')">Avançar</a>
+                    <div class="flex bg-white sm:rounded-lg justify-end ">
+                        <a class="btn btn-blue" id="nextPage" onclick="setTab('personal')">Avançar</a>
                     </div>
                 </div>
 
@@ -73,30 +77,30 @@ $customer = $payment->customer;
                 id="tab-personal"
                 role="tabpanel"
                 aria-labelledby="tab-personal">
-                <h1 class="">Dados Pessoais</h1>
+                <h1 class="text-bold text-xl">Dados Pessoais</h1>
                 <form action="{{ $payment->id . '/personal'}}" method="post">
-                    <input type="hidden" name="" id="personal-paymentId" value="{{$payment->id}}">
                     <input type="hidden" name="customer_id" id="personal-paymentId" value="{{$customer->id ?? ''}}">
                     <div class="my-4">
-                        <label for="payment-name" class="pointer-events-none left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[1.6] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[0.9rem] peer-focus:scale-[0.8] peer-focus:text-primary peer-data-[te-input-state-active]:-translate-y-[0.9rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none dark:text-neutral-200 dark:peer-focus:text-primary">
+                        <label for="payment-name" class="label-control">
                             Nome completo</label>
-                        <input type="text" name="name" id="payment-name" placeholder="João da Silva" class="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-neutral-200 dark:placeholder:text-neutral-200 [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0" value="{{$customer->name ?? ''}}">
+                        <input type="text" name="name" id="payment-name" placeholder="João da Silva" class="form-control" value="{{$customer->name ?? ''}}">
+                        <!-- peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-neutral-200 dark:placeholder:text-neutral-200 [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0" -->
                     </div>
                     <div class="my-4">
-                        <label>Email</label>
-                        <input type="email" name="email" id="payment-email" placeholder="exemplo@exemplo.com" value="{{$customer->email ?? old('email')}}">
+                        <label class="label-control">Email</label>
+                        <input class="form-control" type="email" name="email" id="payment-email" placeholder="exemplo@exemplo.com" value="{{old('email') ?? $customer->email ?? ''}}">
                     </div>
                     <div class="my-4">
-                        <label>CPF</label>
-                        <input type="text" name="cpf" id="payment-document" placeholder="000.000.000-00" value="{{$customer->cpf ?? old('email')}}">
+                        <label class="label-control">CPF</label>
+                        <input class="form-control" type="text" name="cpf" id="payment-document" placeholder="000.000.000-00" value="{{old('cpf') ?? $customer->cpf ?? ''}}">
                     </div>
                     <!-- <div class="my-4">
                         <label>Documento</label>
                         <input type="text" name="document" id="payment-document" placeholder="OA">
                     </div> -->
                     
-                    <div class="flex bg-white overflow-hidden sm:rounded-lg justify-end ">
-                        <button type="submit" class="btn">Enviar Dados</button>
+                    <div class="flex bg-white sm:rounded-lg justify-end ">
+                        <button type="submit" class="btn btn-blue">Salvar</button>
                     </div>
                 </form>
                 </div>
@@ -106,33 +110,27 @@ $customer = $payment->customer;
                 id="tab-card"
                 role="tabpanel"
                 aria-labelledby="tab-card">
-                <h1 class="">Dados do Cartão</h1>
+                <h1 class="text-bold text-xl">Dados do Cartão</h1>
+                @if (session('cardMessage'))
+                <div class="p-4">
+                    {{session('cardMessage')}}
+                </div> 
+                @endif
                 <form action="{{ $payment->id . '/checkout'}}" method="post">
-                    <input type="hidden" name="" id="cardInfo-paymentId" value="{{$payment->id}}">
+                    <input type="hidden" name="customer_id" id="cardInfo-customerId" value="{{old('customer_id') ?? $customer->id ?? ''}}">
                     <div class="my-4">
-                        <label>Nome impresso no Cartão</label>
-                        <input type="text"
-                            class="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 peer-focus:text-primary data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:peer-focus:text-primary [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0"
-                            placeholder="Default input" />
-                        <label
-                            for="exampleFormControlInpu3"
-                            class="pointer-events-none left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[1.6] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[0.9rem] peer-focus:scale-[0.8] peer-focus:text-primary peer-data-[te-input-state-active]:-translate-y-[0.9rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none dark:text-neutral-200 dark:peer-focus:text-primary"
-                            >Default input
-                        </label>
-                        <input type="text" name="card_holder" id="cardInfo-name" placeholder="João da Silva" value="{{old('card_holder')}}">
-                    </div>
-                    <div class="my-4">
-                        <label>Número no Cartão</label>
-                        <input type="number" name="card_number" id="cardInfo-cardNumber" placeholder="0000 0000 0000 0000 0000" value="{{old('card_number')}}">
+                        <label class="label-control">Número do Cartão</label>
+                        <input class="form-control" type="number" name="card_number" id="cardInfo-cardNumber" placeholder="0000 0000 0000 0000 0000" value="{{old('card_number')}}">
                     </div>
 
                     <div class="my-4">
-                        <label>CVV</label>
-                        <input type="number" maxlength=3 name="card_cvv" id="cardInfo-cvv" placeholder="000">
+                        <label class="label-control">CVV</label>
+                        <input class="form-control" type="number" maxlength=3 name="card_cvv" id="cardInfo-cvv" placeholder="000">
                     </div>
                     <div class="my-4">
-                        <label for="card_brand" class="">Bandeira</label>
-                        <select name="card_brand" id="cardInfo-card_brand">
+                        <label class="label-control" for="card_brand" class="">Bandeira</label>
+                        <select class="form-control" name="card_brand" id="cardInfo-card_brand" placeholder="Selecione a bandeira">
+                            <option></option>
                         @foreach($card_brands as $brand)
                         <option value="{{$brand}}" {{old('card_brand') == $brand ? 'selected' : ''}}>
                             {{$brand}}
@@ -141,21 +139,29 @@ $customer = $payment->customer;
                         </select>
                     </div>
                     <div class="my-4">
-                        <label>Validade</label>
-                        <input type="month" maxlength=3 name="card_expiration_date" id="cardInfo-expiration_date" value="{{old('card_expiration_date')}}">
-                    </div>
-                    <div class="my-4">
-                        <label for="installments" class="">Parcelas</label>
-                        <select name="payment_installments" id="cardInfo-installments">
-                        @for($i = 1; $i <= env('CIELO_MAX_INSTALLMENTS', 12); $i++)
+                        <label class="label-control"  for="installments">Parcelas</label>
+                        <select class="form-control" name="payment_installments" id="cardInfo-installments">
+                        @for($i = 1; $i <= env('CIELO_MAX_INSTALLMENTS', 12) && ($i == 1 || (floor($payment->value / $i) >= floatval(env('CIELO_MIN_INSTALLMENT_VALUE')))); $i++)
                         <option value="{{$i}}" {{old('payment_installments') == $i ? 'selected' : ''}}>
-                            {{$i . ' x R$ ' . round($payment->value / $i, 2) }}
+                            {{$i . ' x R$ ' . str_replace('.', ',', sprintf("%.2f", round($payment->value / $i, 2, PHP_ROUND_HALF_DOWN))) }}
                         </option>
                         @endfor
                         </select>
                     </div>
-                    <div class="flex bg-white overflow-hidden sm:rounded-lg justify-end ">
-                        <button class="btn" type="submit">Pagar</button>
+                    
+                    <div class="my-4">
+                        <label class="label-control" >Validade</label>
+                        <input class="form-control" type="month" maxlength=3 name="card_expiration_date" id="cardInfo-expiration_date" value="{{old('card_expiration_date')}}">
+                    </div>
+
+                    <div class="mt-4 mb-10">
+                        <label class="label-control">Nome impresso no Cartão</label>
+
+                        <input class="form-control" type="text" name="card_holder" id="cardInfo-name" placeholder="João da Silva" value="{{old('card_holder')}}">
+                    </div>
+                    
+                    <div class="flex bg-white sm:rounded-lg justify-end ">
+                        <button class="btn btn-success" type="submit">Pagar</button>
                     </div>
                 </form>
                 </div>
@@ -190,18 +196,19 @@ $customer = $payment->customer;
     function redirectToPage()
     {
         const urlParams = new URLSearchParams(window.location.search);
-        const page = urlParams.get('page');
+        let page = urlParams.get('page');
 
-        if (page) {
-            setTab('tab-' + page);
+        if (!page) {
+            page = 'home';
         }
+        setTab(page);
     }
 
     function setTab(tabId) {
         let tabs = document.querySelectorAll('.tab-panel');
-        let tab = document.querySelector('#' + tabId);
+        let selectedTab = document.querySelector('#tab-' + tabId);
 
-        if(tab) {
+        if(selectedTab) {
             tabs.forEach((tab) => {
                 tab.removeAttribute('data-te-tab-active');
                 // tab.classList.add('hidden');
@@ -209,10 +216,18 @@ $customer = $payment->customer;
                 tab.classList.add('opacity-0');
             })
     
-            tab.setAttribute('data-te-tab-active', '');
-            // tab.classList.remove('hidden');
-            tab.classList.remove('opacity-0');
-            tab.classList.add('opacity-100');
+            selectedTab.setAttribute('data-te-tab-active', '');
+            // selectedTab.classList.remove('hidden');
+            selectedTab.classList.remove('opacity-0');
+            selectedTab.classList.add('opacity-100');
+
+            var searchParams = new URLSearchParams(window.location.search);
+            let page = searchParams.get('page');
+
+            if (page != tabId) {
+                searchParams.set("page", tabId);
+                window.location.search = searchParams.toString();
+            }
         }
 
     }
