@@ -49,11 +49,11 @@ class CieloGatewayHelper {
         // Crie uma instância de Credit Card utilizando os dados de teste
         // esses dados estão disponíveis no manual de integração.
         $this->sale->getPayment()->setType(Payment::PAYMENTTYPE_CREDITCARD)
+        ->setSoftDescriptor($softDescriptor)
         ->creditCard($creditCard['cvv'], $creditCard['brand'])
         ->setExpirationDate($creditCard['expiration_date'])
         ->setCardNumber($creditCard['number'])
-        ->setHolder($creditCard['holder'])
-        ->setSoftDescriptor($softDescriptor);
+        ->setHolder($creditCard['holder']);
 
         // Crie o pagamento na Cielo
         try {
