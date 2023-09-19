@@ -13,6 +13,34 @@
   @apply bg-blue-700;
 }
 
+.btn-red {
+  @apply bg-red-500 text-white;
+}
+.btn-red:hover {
+  @apply bg-red-700;
+}
+
+.alert-info {
+  @apply bg-gray-500 text-white py-1 px-2 rounded text-sm m-4;
+}
+
+.alert-success {
+  @apply bg-green-600 text-white py-1 px-2 rounded text-sm m-4;
+}
+
+.alert-blue {
+  @apply bg-blue-500 text-white py-1 px-2 rounded text-sm m-4;
+}
+
+.alert-red {
+  @apply bg-red-500 text-white py-1 px-2 rounded text-sm m-4;
+}
+
+.alert-yellow {
+  @apply bg-yellow-500 text-white py-1 px-2 rounded text-sm m-4;
+}
+
+
 input.form-control  {
   @apply block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] transition-all duration-200 ease-linear focus:placeholder:opacity-100 data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-neutral-200 dark:placeholder:text-neutral-200 [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0;
   background-color: #e4e4e48f;

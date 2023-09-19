@@ -3,6 +3,13 @@
 $pages = 1;
 $currentPage = 1;
 $hasMorePages = false;
+
+$statusColor = [
+  'paid' => 'success',
+  'active' => 'blue',
+  'cancelled' => 'red',
+  'expired' => 'yellow',
+];
 ?>
 <x-app-layout>
     <x-slot name="header">
@@ -50,11 +57,11 @@ $hasMorePages = false;
                               </div>
                             <td>{{ $payment->description }}
                             <td>R$ {{ str_replace('.', ',', sprintf ("%.2f", $payment->value)) }}</td>
-                            <td>{{ __('payments.status.' . $payment->status) }}</td>
+                            <td> <p class="text-center alert-{{$statusColor[$payment->status] ?? 'info'}}">{{ __('payments.status.' . $payment->status) }}</p></td>
                             <td>{{ date('d/m/Y H:i:s', strtotime($payment->created_at)) }}</td>
-                            <td><a href="{{url('/payments/' . $payment->id )}}">Ver</a> | 
+                            <td><a href="{{url('/payments/' . $payment->id )}}">Ver</a> 
                               @if(in_array($payment->status, ['active', 'inactive'])) 
-                              <a href="{{url('/payments/' . $payment->id . '/toggle-active')}}"> {{ $payment->status == 'active' ? 'Desativar' : 'Ativar'}} </a>
+                              | <a href="{{url('/payments/' . $payment->id . '/toggle-active')}}"> {{ $payment->status == 'active' ? 'Desativar' : 'Ativar'}} </a>
                               @endif
                               <!-- @if ($payment->status == 'cancelled')
                               <a href="{{url('/payments/' . $payment->id . '/delete')}}"> Remover</a> | 
