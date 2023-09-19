@@ -53,6 +53,37 @@ class PaymentController extends Controller
         return redirect('payments');
     }
 
+    public function update(Payment $payment, Request $request)
+    {
+        $request->validate([
+            'value' => 'required|numeric',
+            'description' => 'required',
+            'expire_at' => 'nullable|date'
+        ]);
+        
+        $message = 'O pagamento já foi efetuado. Não é possível editar os dados.';
+
+        if ($payment->status != Payment::STATUS_PAID) {
+            $payment->fill($request->all());
+            $payment->save();
+            $message = 'O link de pagamento foi atualizado com sucesso';
+        }
+
+        return redirect('/payments/' . $payment->id)->with('editMessage', $message);
+    }
+
+
+    function destroy(Payment $payment)
+    {
+        $message = 'O pagamento já foi pago e não pode ser removido';
+        if ($payment->status != Payment::STATUS_PAID) {
+            $payment->delete();
+            $message = 'O pagamento foi removido com sucesso';
+        }
+
+        return redirect('payments')->with('message', $message);
+    }
+
     function toggleActive(Payment $payment)
     {
         switch ($payment->status)

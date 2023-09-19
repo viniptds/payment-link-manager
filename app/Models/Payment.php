@@ -30,4 +30,18 @@ class Payment extends Model
     {
         return $this->belongsTo(User::class, 'created_by', 'id');
     }
+
+    public function isExpired()
+    {
+        return $this->expire_at && $this->expire_at < date('Y-m-d H:i:s');
+    }
+
+    protected function getStatusAttribute($value)
+    {
+        if ($value == self::STATUS_ACTIVE && $this->isExpired()) {
+            $value = self::STATUS_EXPIRED;
+        }
+
+        return $value;
+    }
 }

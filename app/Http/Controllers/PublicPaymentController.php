@@ -11,8 +11,11 @@ use Illuminate\Support\Facades\Log;
 
 class PublicPaymentController extends Controller
 {
-    function show(Payment $payment)
+    function show(Payment $payment, Request $request)
     {
+        if (($request->get('page') ?? '') == 'card' && empty($payment->customer)) {
+            return redirect('pay/' . $payment->id);
+        }
         $availableBrands = CieloGatewayHelper::getAvailableBrands();
         return view('public.payment')
         ->with('payment', $payment)
@@ -22,10 +25,10 @@ class PublicPaymentController extends Controller
     function personal(Payment $payment, Request $request)
     {
         $request->validate([
-            'email' => 'required',
+            'email' => 'required|email',
             'name' => 'required',
             'cpf' => 'required|cpf',
-            'document' => 'nullable',
+            'document' => 'required|numeric',
             'customer_id' => 'nullable|exists:customers,id'
         ]);
 

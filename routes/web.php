@@ -44,10 +44,10 @@ Route::middleware('auth')->group(function () {
     Route::prefix('payments')->group(function() {
         Route::get('/', [PaymentController::class, 'index'])->name('payments');
         Route::get('/{payment}', [PaymentController::class, 'show'])->name('payment.show');
+        Route::patch('/{payment}', [PaymentController::class, 'update'])->name('payment.update');
+        Route::get('/{payment}/delete', [PaymentController::class, 'destroy'])->name('payment.destroy');
         Route::get('/{payment}/toggle-active', [PaymentController::class, 'toggleActive'])->name('payment.toggle-active');
         Route::get('/{payment}/mark-as-paid', [PaymentController::class, 'markAsPaid'])->name('payment.mark-as-paid');
-
-        Route::post('/{payment}', [PaymentController::class, 'update'])->name('payment.update');
         Route::post('/', [PaymentController::class, 'store']);
     });
 

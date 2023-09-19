@@ -3,7 +3,14 @@ $customer = $payment->customer;
 $page = $_GET['page'] ?? 'home';
 ?>
 <x-guest-layout>
-  @if($payment->status == 'active')
+    @if ($payment->status == 'paid')
+    <div class="paid">Esse link já foi pago. Obrigado por usar nossos serviços.</div>
+    @elseif (in_array($payment->status, ['expired', 'cancelled', 'inactive']))
+    <div class="paid">Esse link não é válido. Solicite um novo link.</div>
+    @elseif ($payment->status == 'waiting_approval')
+    <div class="paid">O pagamento está aguardando aprovação da operadora de pagamentos. Volte em alguns instantes.</div>
+
+    @elseif ($payment->status == 'active')
     <div class="py-5 mb-5">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="flex justify-center pb-5">
@@ -79,12 +86,11 @@ $page = $_GET['page'] ?? 'home';
                 aria-labelledby="tab-personal">
                 <h1 class="text-bold text-xl">Dados Pessoais</h1>
                 <form action="{{ $payment->id . '/personal'}}" method="post">
-                    <input type="hidden" name="customer_id" id="personal-paymentId" value="{{$customer->id ?? ''}}">
+                    <input type="hidden" name="customer_id" id="personal-customerId" value="{{$customer->id ?? ''}}">
                     <div class="my-4">
                         <label for="payment-name" class="label-control">
                             Nome completo</label>
-                        <input type="text" name="name" id="payment-name" placeholder="João da Silva" class="form-control" value="{{$customer->name ?? ''}}">
-                        <!-- peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-neutral-200 dark:placeholder:text-neutral-200 [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0" -->
+                        <input type="text" name="name" id="payment-name" placeholder="João da Silva" class="form-control" value="{{old('name') ?? $customer->name ?? ''}}">
                     </div>
                     <div class="my-4">
                         <label class="label-control">Email</label>
@@ -98,11 +104,6 @@ $page = $_GET['page'] ?? 'home';
                         <label class="label-control">Nº OAB</label>
                         <input class="form-control" type="text" name="document" id="payment-document" placeholder="00000" maxlength=7 value="{{old('document') ?? $customer->document ?? ''}}">
                     </div>
-                    <!-- <div class="my-4">
-                        <label>Documento</label>
-                        <input type="text" name="document" id="payment-document" placeholder="OA">
-                    </div> -->
-                    
                     <div class="flex bg-white sm:rounded-lg justify-end ">
                         <button type="submit" class="btn btn-blue">Salvar</button>
                     </div>
@@ -121,10 +122,10 @@ $page = $_GET['page'] ?? 'home';
                 </div> 
                 @endif
                 <form action="{{ $payment->id . '/checkout'}}" method="post">
-                    <input type="hidden" name="customer_id" id="cardInfo-customerId" value="{{old('customer_id') ?? $customer->id ?? ''}}">
+                    <input type="hidden" name="customer_id" id="cardInfo-customerId" value="{{$customer->id ?? ''}}">
                     <div class="my-4">
                         <label class="label-control">Número do Cartão</label>
-                        <input class="form-control" type="number" name="card_number" id="cardInfo-cardNumber" placeholder="0000 0000 0000 0000 0000" value="{{old('card_number')}}">
+                        <input class="form-control" type="number" name="card_number" id="cardInfo-cardNumber" placeholder="0000 0000 0000 0000" value="{{old('card_number')}}">
                     </div>
 
                     <div class="my-4">
@@ -172,31 +173,12 @@ $page = $_GET['page'] ?? 'home';
             </div>
         </div>
     </div>
-
-
-  @elseif ($payment->status == 'paid')
-  <div class="paid">Esse link já foi pago. Obrigado por usar nossos serviços.</div>
-
-  @elseif (in_array($payment->status, ['expired', 'cancelled', 'inactive']))
-  <div class="paid">Esse link não é válido. Solicite um novo link.</div>
-
-  @endif
+    @endif
 
 
 
 @section('js')
 <script>
-    function sendPersonalData()
-    {
-
-    }
-
-
-    function sendCardData()
-    {
-
-    }
-
     function redirectToPage()
     {
         const urlParams = new URLSearchParams(window.location.search);
@@ -209,19 +191,20 @@ $page = $_GET['page'] ?? 'home';
     }
 
     function setTab(tabId) {
+        if (!verifyTabRules(tabId)) {
+            return false;
+        }
         let tabs = document.querySelectorAll('.tab-panel');
         let selectedTab = document.querySelector('#tab-' + tabId);
 
         if(selectedTab) {
             tabs.forEach((tab) => {
                 tab.removeAttribute('data-te-tab-active');
-                // tab.classList.add('hidden');
                 tab.classList.remove('opacity-100');
                 tab.classList.add('opacity-0');
             })
     
             selectedTab.setAttribute('data-te-tab-active', '');
-            // selectedTab.classList.remove('hidden');
             selectedTab.classList.remove('opacity-0');
             selectedTab.classList.add('opacity-100');
 
@@ -234,6 +217,17 @@ $page = $_GET['page'] ?? 'home';
             }
         }
 
+    }
+    function verifyTabRules(tab) {
+        let valid = true;
+        if (tab == 'card') {
+            let customerId = document.querySelector('#personal-customerId');
+
+            if (!customerId.value.length) {
+                valid = false;
+            }
+        }
+        return valid;
     }
 
     document.addEventListener("DOMContentLoaded", function(e) {
