@@ -17,15 +17,6 @@ class Payment extends Model
     const STATUS_PAID = 'paid';
     const STATUS_CANCELLED = 'cancelled';
 
-    const STEP_PERSONAL = 'personal';
-    const STEP_ADDRESS = 'address';
-    const STEP_CARD = 'card';
-
-    const STEPS = [
-        self::STEP_PERSONAL,
-        self::STEP_CARD
-    ];
-
     protected $fillable = [
         'id', 'value', 'description', 'status', 'transaction_log', 'expire_at', 'cancelled_at', 'paid_at'
     ];
