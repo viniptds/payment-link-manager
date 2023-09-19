@@ -5,6 +5,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PublicPaymentController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -31,9 +32,12 @@ Route::prefix('pay')->group(function() {
 });
 
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::prefix('profile')->group(function() {
+        Route::get('/', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::get('/toggle-admin', [ProfileController::class, 'toggleAdmin'])->name('profile.toggleAdmin');
+        Route::patch('/', [ProfileController::class, 'update'])->name('profile.update');
+        Route::delete('/', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    });
     
     Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['verified'])->name('dashboard');
 
@@ -50,11 +54,13 @@ Route::middleware('auth')->group(function () {
     Route::prefix('customers')->group(function() {
         Route::get('/', [CustomerController::class, 'index'])->name('customers');
         Route::get('/{customer}', [CustomerController::class, 'show'])->name('customers.show');
-        // Route::get('/{payment}/toggle-active', [PaymentController::class, 'toggleActive'])->name('payment.toggle-active');
-        // Route::get('/{payment}/mark-as-paid', [PaymentController::class, 'markAsPaid'])->name('payment.mark-as-paid');
+    });
 
-        // Route::post('/{payment}', [PaymentController::class, 'update'])->name('payment.update');
-        // Route::post('/', [PaymentController::class, 'store']);
+    Route::prefix('users')->group(function() {
+        Route::get('/', [UserController::class, 'index'])->name('users');
+        Route::get('/{user}', [UserController::class, 'show'])->name('users.show');
+        Route::get('/{user}/toggle-admin', [UserController::class, 'toggleAdmin'])->name('users.toggle-admin');
+        Route::post('/', [UserController::class, 'store'])->name('users.store');
     });
 });
 

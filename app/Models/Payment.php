@@ -18,11 +18,16 @@ class Payment extends Model
     const STATUS_CANCELLED = 'cancelled';
 
     protected $fillable = [
-        'id', 'value', 'description', 'status', 'transaction_log', 'expire_at', 'cancelled_at', 'paid_at'
+        'id', 'value', 'description', 'status', 'transaction_log', 'created_by', 'expire_at', 'cancelled_at', 'paid_at'
     ];
 
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
+    }
+
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by', 'id');
     }
 }

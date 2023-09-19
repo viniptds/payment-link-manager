@@ -21,6 +21,12 @@
                     <x-nav-link :href="route('customers')" :active="request()->routeIs('customers')">
                         {{ __('Customers') }}
                     </x-nav-link>
+                    @if(Auth::user()->is_admin)
+                    <x-nav-link :href="route('users')" :active="request()->routeIs('users')">
+                        {{ __('Users') }}
+                    </x-nav-link>
+                    @endif
+
                 </div>
             </div>
 
@@ -82,6 +88,11 @@
             <x-responsive-nav-link :href="route('customers')" :active="request()->routeIs('customers')">
                 {{ __('Customers') }}
             </x-responsive-nav-link>
+            @if(Auth::user()->is_admin)
+            <x-responsive-nav-link :href="route('users')" :active="request()->routeIs('users')">
+                {{ __('Users') }}
+            </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->

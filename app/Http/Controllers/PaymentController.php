@@ -8,9 +8,14 @@ use Illuminate\Support\Str;
 
 class PaymentController extends Controller
 {
-    function index() 
+    function index(Request $request) 
     {
-        $links = Payment::select()->orderByDesc('created_at')->get();
+        if ($request->user()->is_admin) {
+            $links = Payment::select()->orderByDesc('created_at')->get();
+        } else {
+            $links = Payment::select()->where('created_by', $request->user()->id)->orderByDesc('created_at')->get();
+        }
+
         return view('payments.index', [
             'links' => $links,
         ]);
@@ -36,6 +41,7 @@ class PaymentController extends Controller
         $payment->value = $data['value'];
         $payment->description = $data['description'];
         $payment->expire_at = $data['expire_at'] ?? null;
+        $payment->created_by = $request->user()->id ?? null;
         $payment->status = Payment::STATUS_ACTIVE;
 
         if ($payment->expire_at && $payment->expire_at <= date('Y-m-d H:i:s')) {

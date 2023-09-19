@@ -223,6 +223,7 @@ return [
         'card_expiration_date' => 'data de validade do cartão',
         'payment_installments' => 'número de parcelas',
         'customer_id' => 'dados do cliente',
+        'expire_at' => 'data de expiração',
 
         'cpf' => 'CPF'
     ],
