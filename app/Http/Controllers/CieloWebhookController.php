@@ -14,7 +14,7 @@ class CieloWebhookController extends Controller
     public function notification(Request $request)
     {
         Log::debug('WEBHOOK - Notification');
-        Log::info(json_encode($request->post()));
+        Log::info(json_encode($request->all()));
         $paymentId = $request->post('PaymentId');
         $changeType = $request->post('ChangeType');
 
@@ -27,7 +27,7 @@ class CieloWebhookController extends Controller
     public function changeStatus(Request $request)
     {
         Log::debug('WEBHOOK - Change status');
-        Log::info(json_encode($request->post()));
+        Log::info(json_encode($request->all()));
         
         // Temporary response
         return response('', 200);
@@ -36,7 +36,7 @@ class CieloWebhookController extends Controller
     public function returnHook(Request $request)
     {
         Log::debug('WEBHOOK - Return');
-        Log::info(json_encode($request->post()));
+        Log::info(json_encode($request->all()));
         
         // Temporary response
         return response('', 200);
