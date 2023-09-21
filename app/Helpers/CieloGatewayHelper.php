@@ -8,8 +8,9 @@ use Cielo\API30\Ecommerce\Sale;
 use Cielo\API30\Ecommerce\CieloEcommerce;
 use Cielo\API30\Ecommerce\Payment;
 use Cielo\API30\Ecommerce\CreditCard;
-
 use Cielo\API30\Ecommerce\Request\CieloRequestException;
+
+use Illuminate\Support\Facades\Log;
 
 class CieloGatewayHelper {
 
@@ -17,25 +18,27 @@ class CieloGatewayHelper {
     private $merchant;
     private $sale;
     private $maxInstallments;
+    private $transactionId;
 
-    function __construct($transactionId) {
+    public function __construct($transactionId) {
         if(env('CIELO_IS_ENABLED', false) === false) {
             throw new Exception('O gateway não está ativo');
         }
+        $this->transactionId = $transactionId;
         $this->merchant = new Merchant(env('CIELO_MERCHANT_ID'), env('CIELO_MERCHANT_KEY'));
         $this->sale = new Sale($transactionId);
         $this->environment = env('CIELO_API_ENVIRONMENT', 'sandbox') == 'production' ? Environment::production() : Environment::sandbox();
         $this->maxInstallments = env('CIELO_MAX_INSTALLMENTS', 12);
     }
 
-    function setCustomer($customerName)
+    public function setCustomer($customerName)
     {
         if (!empty($customerName)) {
             $this->sale->customer($customerName);
         }
     }
 
-    function setPayment($value, $installments = 1)
+    public function setPayment($value, $installments = 1)
     {
         if (!empty($value) && $installments > 0 && $installments <= $this->maxInstallments) {
             $this->sale->payment($value * 100, $installments);
@@ -43,11 +46,15 @@ class CieloGatewayHelper {
         
     }
 
-    function makeCreditCardPayment($creditCard)
+    public function getTransactionId()
+    {
+        return $this->transactionId;
+    }
+
+    public function makeCreditCardPayment($creditCard)
     {
         $softDescriptor = 'OABCEARA';
-        // Crie uma instância de Credit Card utilizando os dados de teste
-        // esses dados estão disponíveis no manual de integração.
+
         $this->sale->getPayment()->setType(Payment::PAYMENTTYPE_CREDITCARD)
         ->setCapture(true)
         ->setSoftDescriptor($softDescriptor)
@@ -58,62 +65,158 @@ class CieloGatewayHelper {
 
         // Crie o pagamento na Cielo
         try {
-            // Configure o SDK com seu merchant e o ambiente apropriado para criar a venda
+            Log::debug('Creating sale on Cielo...');
             $sale = (new CieloEcommerce($this->merchant, $this->environment))->createSale($this->sale);
+            Log::debug(json_encode($sale));
 
             return $sale;
-            // O token gerado pode ser armazenado em banco de dados para vendar futuras
-            // $token = $sale->getPayment()->getCreditCard()->getCardToken();
         } catch (CieloRequestException $e) {
-            // Em caso de erros de integração, podemos tratar o erro aqui.
-            // os códigos de erro estão todos disponíveis no manual de integração.
             $error = $e->getCieloError();
             Log::error($error);
-            Log::debug(json_encode($e));
-            var_dump($e);
-            var_dump($error);
+
+            return [
+                'error' => $error->getMessage(),
+                'code' => $error->getCode()
+            ];
+        }
+    }
         }
     }
 
 
     public function getSale($paymentId) {
         try {
-            $sale = (new CieloEcommerce($this->merchant, $this->environment))->getSale($paymentId);return $sale;
+            Log::debug('Getting sale on Cielo...');
+            $sale = (new CieloEcommerce($this->merchant, $this->environment))->getSale($paymentId);
+            Log::debug(json_encode($sale));
+            return $sale;
         } catch(CieloRequestException $e) {
             $error = $e->getCieloError();
-            var_dump($e);
+            Log::error(json_encode($error));
         }
+        return false;
     }
     public function getBinData($bin) {
         try {
+            Log::debug('Getting BIN data on Cielo...');
             $binData = (new CieloEcommerce($this->merchant, $this->environment))->getBinInformations($bin);
+            Log::debug(json_encode($binData));
             return $binData;
         } catch(CieloRequestException $e) {
             $error = $e->getCieloError();
+            Log::error($error);
         }
     }
 
-    public static function getReturnMessageByCode($responseCode)
+    public static function creditCardPaymentIsSuccessful($status, $returnCode)
     {
-        $defaultMessage = 'Falha no pagamento. Tente novamente em alguns instantes';
-        $responseMessages = [
-            '05' => 'Pagamento não autorizado',
-            '57' => 'Cartão expirado',
-            '78' => 'Cartão bloqueado',
-            '99' => 'Timeout',
-            '77' => 'Cartão Cancelado',
-            '70' => 'Problemas com o Cartão de Crédito',
-        ];
+        $success = false;
+        $env = env('APP_ENV', 'sandbox');
+        
+        if ($status == 2) {
+            switch($env) {
+                case 'production':
+                    $success = $returnCode == '00';
+                break;
+                default:
+                    $success = in_array($returnCode, [4, 6]);
+                break;
+            }
+        }
 
-        return $responseMessages[$responseCode] ?? $defaultMessage;
+        return $success;
     }
+
+    public static function getCreditCardPaymentReturnMessages($cardBrand = '')
+    {
+        $env = env('APP_ENV', 'sandbox');
+
+        if ($env == 'production') {
+            $responseMessagesDescription = [
+                'Contate a Central do seu cartão',
+                'Não Autorizada',
+                'Senha inválida',
+                'Senha inválida',
+                'Transação não permitida para o cartão',
+                'Transação não permitida para o cartão. Não tente novamente',
+                'Verifique os dados do cartão',
+                'Verifique os dados do cartão',
+                'Verifique os dados do cartão',
+                'Suspeita de fraude'
+            ];
+
+            switch($cardBrand) {
+                case CreditCard::ELO:
+                    $responseMessagesCodes = [
+                        '5',
+                        '51',
+                        '55',
+                        '55',
+                        'x',
+                        '57',
+                        '14',
+                        '56',
+                        '63',
+                        '59',
+                    ];
+                break;
+
+                case CreditCard::VISA:
+                    $responseMessagesCodes = [
+                        '5',
+                        '51',
+                        '55',
+                        '86',
+                        'x',
+                        '57',
+                        '14',
+                        '14',
+                        'N7',
+                        '59',
+                    ];
+                    break;
+    
+
+                case CreditCard::MASTERCARD:
+                    $responseMessagesCodes = [
+                        '5',
+                        '51',
+                        '55',
+                        '55',
+                        '57',
+                        'x',
+                        '14',
+                        '1',
+                        '63',
+                        '63',
+                    ];
+                break;
+
+            }
+
+            $responseMessages = array_combine($responseMessagesCodes, $responseMessagesDescription);
+        } else {
+            $responseMessages = [
+                '05' => 'Pagamento não autorizado',
+                '57' => 'Cartão expirado',
+                '78' => 'Cartão bloqueado',
+                '99' => 'Timeout',
+                '77' => 'Cartão Cancelado',
+                '70' => 'Problemas com o Cartão de Crédito',
+            ];
+        }
+        
+        
+
+        return $responseMessages;
+    }
+
 
     public static function getAvailableBrands()
     {
         return [
             CreditCard::VISA,
             CreditCard::MASTERCARD,
-            CreditCard::AMEX,
             CreditCard::ELO,
         ];
     }

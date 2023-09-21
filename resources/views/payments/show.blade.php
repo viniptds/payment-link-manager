@@ -12,6 +12,12 @@ $statusColor = [
   'cancelled' => 'red',
   'expired' => 'yellow',
 ];
+
+$hasPayment = !empty($payment->latestPayment);
+$transactions = $payment->gatewayOperations()->orderByDesc('created_at')->get()->all() ?? false;
+
+$customer = $payment->customer ?? false;
+?>
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -50,22 +56,36 @@ $statusColor = [
                   <div class="my-5 mr-3">
                     <a class="btn btn-blue" href="{{url('/pay/' . $payment->id . '/receipt')}}" target="_blank"> Ver Recibo </a>
                   </div>
+                    @if ($hasPayment)
+                    <div class="my-5 mr-3">
+                      <a class="btn btn-red cursor-pointer" id="btnCancelPurchase" data-paymentid="{{$payment->id}}">Cancelar Compra</a>
+                    </div>
+                    @endif
                   @endif
                   @if ($payment->status == 'active')
                   <div class="my-5 mr-3">
                     <a class="btn btn-blue" href="{{url('/payments/' . $payment->id . '/mark-as-paid')}}"> Marcar como Pago </a>
                   </div>
                   @endif
-                  @if ($payment->status != 'paid')
+                  @if (empty($payment->gatewayOperations) || !in_array($payment->status, ['paid', 'cancelled']))
                   <div class="my-5">
                     <a class="btn btn-red" href="{{url('/payments/' . $payment->id . '/delete')}}"> Remover </a>
                   </div>
                   @endif
                 </div>
 
-                @if ($payment->transaction_log ?? false)
-                <p>Logs da transação:</p>
-                {{$payment->transaction_log}}
+                @if ($hasPayment)
+                <p class="text-lg my-3 font-bold">Movimentações: </p>
+                  @foreach ($transactions as $paymentTransaction)
+                  <p class="">Data: {{date('d/m/Y H:i:s', strtotime($paymentTransaction->created_at))}}</p>
+                  <p class="">Tipo: {{$paymentTransaction->type == 'void' ? 'Cancelamento' : "Pagamento"}}</p>
+                  <p class="">Status: {{$paymentTransaction->status ? 'Aprovado' : "Negado"}}</p>
+                  <details class="mt-2 mb-4 ">
+                    <summary class="w-16 "><span class="btn btn-info">Logs</span></summary>
+                    <p class="flex break-all m-2">{{$paymentTransaction->log}}</p>
+
+                  </details>
+                  @endforeach
                 @endif
             </div>
 
@@ -129,6 +149,7 @@ $statusColor = [
             @endif
         </div>
     </div>
+
 @section('js')
 <script src="{{url('/cielo/installment-calculator-dynamic.js')}}"></script>
 <script>

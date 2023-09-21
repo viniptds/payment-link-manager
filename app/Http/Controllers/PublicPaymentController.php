@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\CieloGatewayHelper;
 use App\Models\Customer;
+use App\Models\GatewayOperation;
 use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -55,6 +56,8 @@ class PublicPaymentController extends Controller
 
     function checkout(Payment $payment, Request $request)
     {
+        $success = false;
+
         $request->validate([
             'card_number' => 'required',
             'card_holder' => 'required',
@@ -86,27 +89,41 @@ class PublicPaymentController extends Controller
             $cieloHelper->setPayment($payment->value, $data['payment_installments']);
 
             $sale = $cieloHelper->makeCreditCardPayment($card);
-            $cieloPayment = $sale->getPayment();
-            $returnCode = $cieloPayment->getReturnCode();
-            $status = $cieloPayment->getStatus();
             
-            if ($status == 2 && $returnCode == '00') {
-                Log::debug(json_encode($cieloPayment));
-                $payment->transaction_log = json_encode($cieloPayment);
-                $payment->status = Payment::STATUS_PAID;
-                $payment->paid_at = date('Y-m-d H:i:s');
-                $payment->save();
+            if ($sale) {
+                $cieloPayment = $sale->getPayment();
+                $returnCode = $cieloPayment->getReturnCode();
+                $status = $cieloPayment->getStatus();
 
-                return redirect('pay/' . $payment->id . '/receipt')->with('receiptMessage', 'O pagamento foi realizado com sucesso!');
-            } else {
-                Log::debug('Payment Id: ' . $payment->id);
-                Log::debug('Return Code: ' . $returnCode);
-                Log::debug('Payment Status: ' . $status);
-                $response = CieloGatewayHelper::getReturnMessageByCode($returnCode);
+                // Save gateway operation
+                $gatewayOperation = new GatewayOperation();
+                $gatewayOperation->gateway = 'CIELO30';
+                $gatewayOperation->type = GatewayOperation::PAY_OPERATION;
+                $gatewayOperation->status = false;
+                $gatewayOperation->log = json_encode($cieloPayment);
+                
+                if (CieloGatewayHelper::creditCardPaymentIsSuccessful($status, $returnCode)) {
+                    $payment->status = Payment::STATUS_PAID;
+                    $payment->paid_at = date('Y-m-d H:i:s');
+                    $payment->save();
+
+                    $gatewayOperation->status = true;
+                    $success = true;
+                } else {
+                    Log::debug('Payment Id: ' . $payment->id);
+                    Log::debug('Return Code: ' . $returnCode);
+                    Log::debug('Payment Status: ' . $status);
+                    $returnOptions = CieloGatewayHelper::getCreditCardPaymentReturnMessages($card['brand']);
+                    $response = $returnOptions[$returnCode] ?? 'Falha no pagamento.';
+                }
+
+                $payment->gatewayOperations()->save($gatewayOperation);
             }
         }
 
-        return redirect('pay/' . $payment->id . "?page=card")->with('cardMessage', $response);
+        return $success ? 
+            redirect('pay/' . $payment->id . '/receipt')->with('receiptMessage', 'O pagamento foi realizado com sucesso!') : 
+            redirect('pay/' . $payment->id . "?page=card")->with('cardMessage', $response);
         
     }
     

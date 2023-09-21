@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Traits\UUID;
 
 class Payment extends Model
@@ -29,6 +30,16 @@ class Payment extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by', 'id');
+    }
+
+    public function gatewayOperations(): HasMany
+    {
+        return $this->hasMany(GatewayOperation::class);
+    }
+
+    public function getLatestPaymentAttribute()
+    {
+        return $this->gatewayOperations()->where('status', true)->where('type', GatewayOperation::PAY_OPERATION)->get()->last();
     }
 
     public function isExpired()

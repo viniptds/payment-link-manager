@@ -1,5 +1,5 @@
 <?php
-$transaction = json_decode($payment->transaction_log, 0);
+$transaction = json_decode($payment->latestPayment->log ?? '', 0);
 ?>
 
 <x-guest-layout>
