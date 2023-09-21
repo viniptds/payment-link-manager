@@ -18,7 +18,7 @@ class Payment extends Model
     const STATUS_CANCELLED = 'cancelled';
 
     protected $fillable = [
-        'id', 'value', 'description', 'status', 'transaction_log', 'created_by', 'expire_at', 'cancelled_at', 'paid_at'
+        'id', 'value', 'description', 'status', 'max_installments', 'created_by', 'expire_at', 'cancelled_at', 'paid_at'
     ];
 
     public function customer(): BelongsTo
@@ -42,6 +42,14 @@ class Payment extends Model
             $value = self::STATUS_EXPIRED;
         }
 
+        return $value;
+    }
+
+    protected function getMaxInstallmentsAttribute($value)
+    {
+        if (is_null($value)) {
+            $value = env('CIELO_MAX_INSTALLMENTS', 12);
+        }
         return $value;
     }
 }

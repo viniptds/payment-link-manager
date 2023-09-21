@@ -36,7 +36,7 @@ $statusColor = [
 
     <div class="py-5">
         <div class="max-w-7lg mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-5">
+            <div class="bg-white overflow-y-hidden shadow-sm sm:rounded-lg p-5">
                 <table id="links_table" class="w-full">
                     <thead class="py-5">
                         <th class="">Link</th>
@@ -116,7 +116,7 @@ $statusColor = [
   aria-hidden="true">
   <div
     data-te-modal-dialog-ref
-    class="pointer-events-none relative w-auto translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
+    class="pointer-events-none relative w-auto translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-12 min-[576px]:max-w-[500px] top-20">
     <div
       class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none dark:bg-neutral-600">
       <div
@@ -150,19 +150,22 @@ $statusColor = [
       <form method="POST" action="payments">
         <!--Modal body-->
         <div class="relative flex-auto p-4" data-te-modal-body-ref>
-          
               @csrf
-              <div class="">
-                <label for="valueInput" >Valor de Pagamento</label>
-                <input class='form-control' id='valueInput' name='value' type="number" step="0.01" required>
+              <div class="mb-2">
+                <label for="valueInput" >Valor de Pagamento *</label>
+                <input class='form-control' id='valueInput' name='value' type="number" step="0.01" min="50" title="Valor mínimo de R$ 50,00" onkeyup="updateInstallments(this, 'maxInstallmentsSelect')" required>
               </div>
-              <div class="">
-                <label>Descrição</label>
+              <div class="mb-2">
+                <label>Descrição *</label>
                 <input class="form-control" name='description' id='descriptionInput' type="text" maxlength='100' required>
               </div>
-              <div class="">
+              <div class="mb-2">
                 <label>Válido até</label>
                 <input class="form-control" name='expire_at' id='expireAtInput' type="datetime-local">
+              </div>
+              <div class="mb-2">
+                <label>Número de Parcelas</label>
+                <select class="form-control" name='max_installments' id='maxInstallmentsSelect'></select>
               </div>
         </div>  
 
@@ -192,7 +195,11 @@ $statusColor = [
 </div>
 
 @section('js')
+<script src="{{url('/cielo/installment-calculator-dynamic.js')}}"></script>
 <script>
+    const maxInstallments = parseInt("{{env('CIELO_MAX_INSTALLMENTS', 12)}}");
+    const installmentMinValue = parseFloat("{{env('CIELO_MIN_INSTALLMENT_VALUE', 50)}}");
+
     document.querySelectorAll('.btn-copy').forEach((item) => {
       item.addEventListener('click', function (evt) {
         let content = evt.target.dataset.content;
@@ -206,8 +213,7 @@ $statusColor = [
       })
     });
 
-    function returnCopied(element)
-    {
+    function returnCopied(element) {
       element.classList.add('btn-blue');
       element.classList.remove('btn-success');
     }

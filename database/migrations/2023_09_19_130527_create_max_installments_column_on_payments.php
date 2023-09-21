@@ -12,9 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('payments', function (Blueprint $table) {
-            $table->dateTime('expire_at')->nullable()->change();
-            $table->dateTime('cancelled_at')->nullable()->change();
-            $table->dateTime('paid_at')->nullable()->change();
+            $table->integer('max_installments')->nullable();
         });
     }
 
@@ -23,6 +21,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+
     }
 };

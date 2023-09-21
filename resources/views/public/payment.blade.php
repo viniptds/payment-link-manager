@@ -130,7 +130,7 @@ $page = $_GET['page'] ?? 'home';
 
                     <div class="my-4">
                         <label class="label-control">CVV</label>
-                        <input class="form-control" type="number" maxlength=3 name="card_cvv" id="cardInfo-cvv" placeholder="000">
+                        <input class="form-control" type="number" maxlength='3' name="card_cvv" id="cardInfo-cvv" placeholder="000">
                     </div>
                     <div class="my-4">
                         <label class="label-control" for="card_brand" class="">Bandeira</label>
@@ -146,7 +146,7 @@ $page = $_GET['page'] ?? 'home';
                     <div class="my-4">
                         <label class="label-control"  for="installments">Parcelas</label>
                         <select class="form-control" name="payment_installments" id="cardInfo-installments">
-                        @for($i = 1; $i <= env('CIELO_MAX_INSTALLMENTS', 12) && ($i == 1 || (floor($payment->value / $i) >= floatval(env('CIELO_MIN_INSTALLMENT_VALUE')))); $i++)
+                        @for($i = 1; $i <= $payment->max_installments && ($i == 1 || (floor($payment->value / $i) >= floatval(env('CIELO_MIN_INSTALLMENT_VALUE')))); $i++)
                         <option value="{{$i}}" {{old('payment_installments') == $i ? 'selected' : ''}}>
                             {{$i . ' x R$ ' . str_replace('.', ',', sprintf("%.2f", round($payment->value / $i, 2, PHP_ROUND_HALF_DOWN))) }}
                         </option>
@@ -166,7 +166,7 @@ $page = $_GET['page'] ?? 'home';
                     </div>
                     
                     <div class="flex bg-white sm:rounded-lg justify-end ">
-                        <button class="btn btn-success" type="submit">Pagar</button>
+                        <button class="btn btn-success" type="submit" id="btnPay">Pagar</button>
                     </div>
                 </form>
                 </div>
@@ -179,8 +179,7 @@ $page = $_GET['page'] ?? 'home';
 
 @section('js')
 <script>
-    function redirectToPage()
-    {
+    function redirectToPage() {
         const urlParams = new URLSearchParams(window.location.search);
         let page = urlParams.get('page');
 
@@ -233,6 +232,14 @@ $page = $_GET['page'] ?? 'home';
     document.addEventListener("DOMContentLoaded", function(e) {
         redirectToPage();
     });
+
+    document.querySelector("#btnPay").addEventListener('click', function(e) {
+        if(e.target.dataset['clicked'] == '') {
+            e.preventDefault();
+        }
+        e.target.setAttribute("data-clicked", '');
+
+    })
 </script>
 @endsection
 
