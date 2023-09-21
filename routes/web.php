@@ -48,6 +48,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/{payment}/delete', [PaymentController::class, 'destroy'])->name('payment.destroy');
         Route::get('/{payment}/toggle-active', [PaymentController::class, 'toggleActive'])->name('payment.toggle-active');
         Route::get('/{payment}/mark-as-paid', [PaymentController::class, 'markAsPaid'])->name('payment.mark-as-paid');
+        Route::put('/{payment}/void', [PaymentController::class, 'void'])->name('payment.void');
         Route::post('/', [PaymentController::class, 'store']);
     });
 

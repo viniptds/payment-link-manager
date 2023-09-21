@@ -36,6 +36,9 @@
     <script
   type="text/javascript"
   src="../node_modules/tw-elements/dist/js/tw-elements.umd.min.js"></script>
+  <script>
+    const baseURL = "{{env('APP_URL')}}";
+  </script>
     @yield('js')
 
 </html>

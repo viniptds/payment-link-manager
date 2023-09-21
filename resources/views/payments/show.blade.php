@@ -162,6 +162,46 @@ $customer = $payment->customer ?? false;
     updateInstallments(input, 'maxInstallmentsSelect',  selectedValue);
   });
 
+  @if ($hasPayment)
+  function voidTransaction(element) {
+    let paymentId = element.dataset.paymentid;
+
+    const requestOptions = {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: []
+    };
+
+    fetch(baseURL + '/payments/' + paymentId + '/void', requestOptions)
+      .then((json) => {
+        return json.json();
+      })
+      .then((data) => {
+        console.log(data);
+        if (data.status) {
+          location.reload();
+        }
+      })
+      .catch((err) => console.log(err))
+      .finally(() => {
+        element.removeAttribute('data-clicked')
+      })
+  }
+
+  document.querySelector('#btnCancelPurchase').addEventListener('click', function (evt) {
+    evt.preventDefault();
+
+    if (evt.target.dataset['clicked'] == '') {
+      return;
+    }
+    if (confirm('Tem certeza que deseja fazer o estorno desse pagamento?')) {
+      evt.target.setAttribute("data-clicked", '')
+
+      voidTransaction(evt.target)
+    }
+
+  });
+  @endif
 
 </script>
 @endsection

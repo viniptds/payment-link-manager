@@ -80,9 +80,22 @@ class CieloGatewayHelper {
             ];
         }
     }
+
+    public function cancelPayment($paymentId, $amount)
+    {
+        // Aplica o estorno no gateway
+        try {
+            Log::debug('Cancelling sale on Cielo...');
+            $sale = (new CieloEcommerce($this->merchant, $this->environment))->cancelSale($paymentId, $amount * 100);
+            Log::debug(json_encode($sale));
+
+            return $sale;
+            
+        } catch (CieloRequestException $e) {            
+            $error = $e->getCieloError();
+            Log::error(json_encode($error));
         }
     }
-
 
     public function getSale($paymentId) {
         try {
@@ -205,12 +218,37 @@ class CieloGatewayHelper {
                 '70' => 'Problemas com o Cartão de Crédito',
             ];
         }
-        
-        
 
         return $responseMessages;
     }
 
+    public static function creditCardVoidIsSuccessful($status)
+    {
+        $success = false;
+        $env = env('APP_ENV', 'sandbox');
+        
+        switch($env) {
+            case 'production':
+                $success = $status == 9;
+            break;
+            default:
+                $success = $status == 10;
+            break;
+        }
+
+        return $success;
+    }
+
+    public static function getCreditCardVoidReturnMessages()
+    {
+        return [
+            '9' => 'Cancelamento realizado com sucesso',
+            '72' => 'Saldo do lojista insuficiente para cancelamento da venda',
+            '77' => 'Venda não encontrada para cancelamento',
+            '100' => 'Forma de pagamento e/ou bandeira não permitem cancelamento',
+            '101' => 'Valor de cancelamento solicitado acima do prazo permitido para cancelar'
+        ];
+    }
 
     public static function getAvailableBrands()
     {
