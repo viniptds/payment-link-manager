@@ -31,7 +31,7 @@ $hasMorePages = false;
                         <th class="">CPF</th>
                         <th class="">Nº OAB</th>
                         <th class="">Criado Em</th>
-                        <!-- <th>Ações</th> -->
+                        <th>Ações</th>
                     </thead>
                     <tbody>
                         @foreach ($customers as $customer)
@@ -44,7 +44,7 @@ $hasMorePages = false;
                             <td>{{ $customer->document ?? '' }}
                             
                             <td>{{ date('d/m/Y H:i:s', strtotime($customer->created_at)) }}</td>
-                            <!-- <td><a href="{{url('/customers/' . $customer->id )}}">Ver</a> -->
+                            <td><a href="{{url('/customers/' . $customer->id )}}">Ver</a>
                             </td>
                         </tr>
                         @endforeach
