@@ -136,52 +136,61 @@ class PaymentController extends Controller
         if ($payment->status == Payment::STATUS_CANCELLED) {
             $response['message'] = 'O pagamento já foi estornado';
         } elseif ($payment->status == Payment::STATUS_PAID) {
-            $payment->latestPayment();
-            $transaction = json_decode($payment->latestPayment()->log ?? '', 1);
-            $paymentId = $transaction['paymentId'] ?? false;
+            $latestPayment = $payment->latestPayment;
+            
+            if ($latestPayment->type != GatewayOperation::PAY_OPERATION) {
+                $response['message'] = 'O último status do pagamento não é válido';
+            } else {
+                $transaction = json_decode($latestPayment->log ?? '', 1);
+                $paymentId = $transaction['paymentId'] ?? false;
 
-            if ($paymentId) {
-                $cieloHelper = new CieloGatewayHelper($payment->id);
-                $sale = $cieloHelper->cancelPayment($paymentId, $payment->amount);
-                
-                if ($sale) {
+                if ($paymentId) {
+                    $cieloHelper = new CieloGatewayHelper($payment->id);
+                    $sale = $cieloHelper->cancelPayment($paymentId, $payment->amount);
+                    $returnOptions = CieloGatewayHelper::getCreditCardVoidReturnMessages();
+
                     // Save gateway operation
                     $gatewayOperation = new GatewayOperation();
                     $gatewayOperation->gateway = 'CIELO30';
                     $gatewayOperation->type = GatewayOperation::VOID_OPERATION;
                     $gatewayOperation->status = false;
-                    
 
-                    if (CieloGatewayHelper::creditCardVoidIsSuccessful($status)) {
-                        $updatedSale = $cieloHelper->getSale($paymentId);
-                        $updatedPayment = $updatedSale->getPayment();
+                    if (is_array($sale)) {
+                        $response['message'] = $returnOptions[$sale['code']] ?? 'Falha no cancelamento do pagamento.';
+                        $sale['response'] = $response['message'];
+                        $gatewayOperation->log = json_encode($sale);
 
-                        if ($updatedPayment->getCapturedAmount() == $updatedPayment->getVoidedAmount()) {
-
-                            $payment->status = Payment::STATUS_CANCELLED;
-                            $payment->save();
-
-                            $gatewayOperation->log = json_encode($sale);
-                            $gatewayOperation->status = true;
-                            
-                            
-                            $response['message'] = 'O pagamento foi cancelado e estornado com sucesso.';
-                            $response['status'] = true;
-                            $response['code'] = 200;
-                        } else {
-                            $response['message'] = 'O valor cancelado é diferente do valor pago. Por favor, verifique no painel Cielo';
-                        }
                     } else {
-                        Log::debug('Payment Id: ' . $payment->id);
-                        Log::debug('Payment Status: ' . $status);
-                        $returnOptions = CieloGatewayHelper::getCreditCardVoidReturnMessages();
-                        $response['message'] = $returnOptions[$status] ?? 'Falha no cancelamento do pagamento.';
+                        $status = $sale->getStatus();
+                        
+                        if (CieloGatewayHelper::creditCardVoidIsSuccessful($status)) {
+                            $updatedSale = $cieloHelper->getSale($paymentId);
+                            $updatedPayment = $updatedSale->getPayment();
+
+                            if ($updatedPayment->getCapturedAmount() == $updatedPayment->getVoidedAmount()) {
+                                $payment->status = Payment::STATUS_CANCELLED;
+                                $payment->save();
+
+                                $gatewayOperation->log = json_encode($sale);
+                                $gatewayOperation->status = true;
+                                
+                                $response['message'] = 'O pagamento foi cancelado e estornado com sucesso.';
+                                $response['status'] = true;
+                                $response['code'] = 200;
+                            } else {
+                                $response['message'] = 'O valor cancelado é diferente do valor pago. Por favor, verifique no painel Cielo';
+                            }
+                        } else {
+                            Log::debug('Payment Id: ' . $payment->id);
+                            Log::debug('Payment Status: ' . $status);
+                            $response['message'] = $returnOptions[$status] ?? 'Falha no cancelamento do pagamento.';
+                        }
                     }
 
                     $payment->gatewayOperations()->save($gatewayOperation);
+                } else {
+                    $response['message'] = 'O pagamento não possui dados de transação';
                 }
-            } else {
-                $response['message'] = 'O pagamento não possui dados de transação';
             }
         } else {
             $response['message'] = 'O pagamento ainda não foi pago para ser cancelado';

@@ -90,17 +90,27 @@ class PublicPaymentController extends Controller
 
             $sale = $cieloHelper->makeCreditCardPayment($card);
             
-            if ($sale) {
+            $gatewayOperation = new GatewayOperation();
+            $gatewayOperation->gateway = 'CIELO30';
+            $gatewayOperation->type = GatewayOperation::PAY_OPERATION;
+            $gatewayOperation->status = false;
+            
+            $returnOptions = CieloGatewayHelper::getCreditCardPaymentReturnMessages($card['brand']);
+
+            if (is_array($sale)) {
+                $response = $returnOptions[$sale['code']] ?? 'Falha no pagamento.';
+                $sale['response'] = $response;
+                $gatewayOperation->log = json_encode($sale);
+
+            } else {
                 $cieloPayment = $sale->getPayment();
                 $returnCode = $cieloPayment->getReturnCode();
                 $status = $cieloPayment->getStatus();
 
-                // Save gateway operation
-                $gatewayOperation = new GatewayOperation();
-                $gatewayOperation->gateway = 'CIELO30';
-                $gatewayOperation->type = GatewayOperation::PAY_OPERATION;
-                $gatewayOperation->status = false;
                 $gatewayOperation->log = json_encode($cieloPayment);
+                
+                Log::debug('Return Code: ' . $returnCode);
+                Log::debug('Payment Status: ' . $status);
                 
                 if (CieloGatewayHelper::creditCardPaymentIsSuccessful($status, $returnCode)) {
                     $payment->status = Payment::STATUS_PAID;
@@ -110,15 +120,10 @@ class PublicPaymentController extends Controller
                     $gatewayOperation->status = true;
                     $success = true;
                 } else {
-                    Log::debug('Payment Id: ' . $payment->id);
-                    Log::debug('Return Code: ' . $returnCode);
-                    Log::debug('Payment Status: ' . $status);
-                    $returnOptions = CieloGatewayHelper::getCreditCardPaymentReturnMessages($card['brand']);
                     $response = $returnOptions[$returnCode] ?? 'Falha no pagamento.';
                 }
-
-                $payment->gatewayOperations()->save($gatewayOperation);
             }
+            $payment->gatewayOperations()->save($gatewayOperation);
         }
 
         return $success ? 

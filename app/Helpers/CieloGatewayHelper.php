@@ -66,18 +66,21 @@ class CieloGatewayHelper {
         // Crie o pagamento na Cielo
         try {
             Log::debug('Creating sale on Cielo...');
+            Log::debug('Payment ID: ' . $this->getTransactionId());
+
             $sale = (new CieloEcommerce($this->merchant, $this->environment))->createSale($this->sale);
             Log::debug(json_encode($sale));
 
             return $sale;
         } catch (CieloRequestException $e) {
             $error = $e->getCieloError();
-            Log::error($error);
-
-            return [
+            $errorResponse = [
                 'error' => $error->getMessage(),
                 'code' => $error->getCode()
             ];
+
+            Log::error($errorResponse);
+            return $errorResponse;
         }
     }
 
@@ -86,14 +89,21 @@ class CieloGatewayHelper {
         // Aplica o estorno no gateway
         try {
             Log::debug('Cancelling sale on Cielo...');
+            Log::debug('Payment ID: ' . $paymentId);
+
             $sale = (new CieloEcommerce($this->merchant, $this->environment))->cancelSale($paymentId, $amount * 100);
             Log::debug(json_encode($sale));
 
             return $sale;
-            
-        } catch (CieloRequestException $e) {            
+        } catch (CieloRequestException $e) {
             $error = $e->getCieloError();
-            Log::error(json_encode($error));
+            $errorResponse = [
+                'error' => $error->getMessage(),
+                'code' => $error->getCode()
+            ];
+
+            Log::error(json_encode($errorResponse));
+            return $errorResponse;
         }
     }
 
@@ -109,6 +119,7 @@ class CieloGatewayHelper {
         }
         return false;
     }
+
     public function getBinData($bin) {
         try {
             Log::debug('Getting BIN data on Cielo...');
@@ -161,7 +172,7 @@ class CieloGatewayHelper {
             switch($cardBrand) {
                 case CreditCard::ELO:
                     $responseMessagesCodes = [
-                        '5',
+                        '05',
                         '51',
                         '55',
                         '55',
@@ -176,7 +187,7 @@ class CieloGatewayHelper {
 
                 case CreditCard::VISA:
                     $responseMessagesCodes = [
-                        '5',
+                        '05',
                         '51',
                         '55',
                         '86',
@@ -192,7 +203,7 @@ class CieloGatewayHelper {
 
                 case CreditCard::MASTERCARD:
                     $responseMessagesCodes = [
-                        '5',
+                        '05',
                         '51',
                         '55',
                         '55',

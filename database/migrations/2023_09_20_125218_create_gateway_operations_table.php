@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('gateway_operations', function (Blueprint $table) {
             $table->uuid('id')->primary('id');
-            $table->foreignUuid('payment_id')->references('id')->on('payments');
+            $table->foreignUuid('payment_id')->references('id')->on('payments')->onDelete('cascade');
             $table->text('log');
             $table->string('type');
             $table->boolean('status');

@@ -13,7 +13,7 @@ $statusColor = [
   'expired' => 'yellow',
 ];
 
-$hasPayment = !empty($payment->latestPayment);
+$hasPayment = ($payment->latestPayment->type ?? null) == 'pay';
 $transactions = $payment->gatewayOperations()->orderByDesc('created_at')->get()->all() ?? false;
 
 $customer = $payment->customer ?? false;
@@ -37,8 +37,12 @@ $customer = $payment->customer ?? false;
 
                 <p>Valor: R$ {{ str_replace('.', ',', sprintf("%.2f", $payment->value))}}</p>
                 <p class='mb-4'>Descrição: {{$payment->description}}</p>
-                <p class='mb-4'>Status: <span class="alert-{{$statusColor[$payment->status] ?? 'info'}}">{{ __('payments.status.' . $payment->status)}}</span></p>
-
+                <p class='mb-4'>Status: 
+                @if ($payment->status == 'active' && $payment->gatewayOperations)
+                <span class="alert-blue">Não Pago</span></p>
+                @else
+                <span class="alert-{{$statusColor[$payment->status] ?? 'info'}}">{{ __('payments.status.' . $payment->status)}}</span></p>
+                @endif
                 @if ($payment->paid_at)
                 <p class='mb-4'>Pago em: {{ $payment->paid_at ? date("d/m/Y H:i:s ", strtotime($payment->paid_at)) : '-'}}</p>
                 @endif
@@ -51,15 +55,21 @@ $customer = $payment->customer ?? false;
                 <p class='mb-4'>Expira em: {{ $payment->expire_at ? date("d/m/Y H:i:s ", strtotime($payment->expire_at)) : '-'}}</p>
                 @endif
 
-                <div class="flex mb-3">
+                <div class="flex">
                   @if ($payment->status == 'paid')
                   <div class="my-5 mr-3">
                     <a class="btn btn-blue" href="{{url('/pay/' . $payment->id . '/receipt')}}" target="_blank"> Ver Recibo </a>
                   </div>
-                    @if ($hasPayment)
-                    <div class="my-5 mr-3">
-                      <a class="btn btn-red cursor-pointer" id="btnCancelPurchase" data-paymentid="{{$payment->id}}">Cancelar Compra</a>
-                    </div>
+                    @if ($hasPayment) 
+                      @if(date('Y-m-d H:i:s', strtotime($payment->paid_at .  ' + 1 day')) <= date('Y-m-d H:i:s'))
+                      <div class="my-5 mr-3">
+                        <a class="btn btn-red cursor-pointer" id="btnCancelPurchase" data-paymentid="{{$payment->id}}">Cancelar Compra</a>
+                      </div>
+                      @else
+                      <div class="my-5 mr-3">
+                        <p class="">A compra poderá ser cancelada após 24 horas do pagamento</p>
+                      </div>
+                      @endif
                     @endif
                   @endif
                   @if ($payment->status == 'active')
@@ -73,8 +83,9 @@ $customer = $payment->customer ?? false;
                   </div>
                   @endif
                 </div>
+                <div id="messageBox" class="hidden p-3"></div>
 
-                @if ($hasPayment)
+                @if ($transactions)
                 <p class="text-lg my-3 font-bold">Movimentações: </p>
                   @foreach ($transactions as $paymentTransaction)
                   <p class="">Data: {{date('d/m/Y H:i:s', strtotime($paymentTransaction->created_at))}}</p>
@@ -165,7 +176,10 @@ $customer = $payment->customer ?? false;
   @if ($hasPayment)
   function voidTransaction(element) {
     let paymentId = element.dataset.paymentid;
-
+    let messageBox = document.querySelector("#messageBox");
+    messageBox.innerHTML = '';
+    messageBox.classList.add('hidden');
+    
     const requestOptions = {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -177,9 +191,11 @@ $customer = $payment->customer ?? false;
         return json.json();
       })
       .then((data) => {
-        console.log(data);
         if (data.status) {
           location.reload();
+        } else {
+          messageBox.innerHTML = data.message;
+          messageBox.classList.remove('hidden');
         }
       })
       .catch((err) => console.log(err))
