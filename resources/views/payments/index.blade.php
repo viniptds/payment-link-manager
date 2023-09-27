@@ -57,7 +57,11 @@ $statusColor = [
                               </div>
                             <td>{{ $payment->description }}
                             <td>R$ {{ str_replace('.', ',', sprintf ("%.2f", $payment->value)) }}</td>
+                            @if ($payment->status == 'active' && $payment->gatewayOperations)
+                            <td> <p class="text-center alert-blue">Não Pago</p></td>
+                            @else
                             <td> <p class="text-center alert-{{$statusColor[$payment->status] ?? 'info'}}">{{ __('payments.status.' . $payment->status) }}</p></td>
+                            @endif
                             <td>{{ date('d/m/Y H:i:s', strtotime($payment->created_at)) }}</td>
                             <td><a href="{{url('/payments/' . $payment->id )}}">Ver</a> 
                               @if(in_array($payment->status, ['active', 'inactive'])) 

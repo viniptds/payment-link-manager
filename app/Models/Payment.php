@@ -39,7 +39,7 @@ class Payment extends Model
 
     public function getLatestPaymentAttribute()
     {
-        return $this->gatewayOperations()->where('status', true)->where('type', GatewayOperation::PAY_OPERATION)->get()->last();
+        return $this->gatewayOperations()->where('status', true)->get()->last();
     }
 
     public function isExpired()
