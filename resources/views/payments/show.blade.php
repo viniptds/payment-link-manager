@@ -43,16 +43,16 @@ $customer = $payment->customer ?? false;
                 @else
                 <span class="alert-{{$statusColor[$payment->status] ?? 'info'}}">{{ __('payments.status.' . $payment->status)}}</span></p>
                 @endif
-                @if ($payment->paid_at)
-                <p class='mb-4'>Pago em: {{ $payment->paid_at ? date("d/m/Y H:i:s ", strtotime($payment->paid_at)) : '-'}}</p>
-                @endif
-
                 @if ($payment->cancelled_at)
                 <p class='mb-4'>Cancelado em: {{ $payment->cancelled_at ? date("d/m/Y H:i:s", strtotime($payment->cancelled_at)) : '-'}}</p>
                 @endif
-
                 @if ($payment->expire_at)
                 <p class='mb-4'>Expira em: {{ $payment->expire_at ? date("d/m/Y H:i:s ", strtotime($payment->expire_at)) : '-'}}</p>
+                @endif
+                
+                @if ($payment->paid_at)
+                <p class='mb-4'>Pago em: {{ $payment->paid_at ? date("d/m/Y H:i:s ", strtotime($payment->paid_at)) : '-'}}</p>
+
                 @endif
 
                 <div class="flex">
@@ -88,8 +88,14 @@ $customer = $payment->customer ?? false;
                 @if ($transactions)
                 <p class="text-lg my-3 font-bold">Movimentações: </p>
                   @foreach ($transactions as $paymentTransaction)
+                  <?php 
+                  $log = json_decode($paymentTransaction->log, 1);
+                  ?>
                   <p class="">Data: {{date('d/m/Y H:i:s', strtotime($paymentTransaction->created_at))}}</p>
                   <p class="">Tipo: {{$paymentTransaction->type == 'void' ? 'Cancelamento' : "Pagamento"}}</p>
+                  @if($paymentTransaction->status)
+                  <p class="">Cartão: {{substr($log['creditCard']['cardNumber'],strpos($log['creditCard']['cardNumber'], '*'))}}</p>
+                  @endif
                   <p class="">Status: {{$paymentTransaction->status ? 'Aprovado' : "Negado"}}</p>
                   <details class="mt-2 mb-4 ">
                     <summary class="w-16 "><span class="btn btn-info">Logs</span></summary>
