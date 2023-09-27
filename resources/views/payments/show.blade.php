@@ -38,7 +38,7 @@ $customer = $payment->customer ?? false;
                 <p>Valor: R$ {{ str_replace('.', ',', sprintf("%.2f", $payment->value))}}</p>
                 <p class='mb-4'>Descrição: {{$payment->description}}</p>
                 <p class='mb-4'>Status: 
-                @if ($payment->status == 'active' && $payment->gatewayOperations)
+                @if ($payment->status == 'active' && $payment->gatewayOperations->count())
                 <span class="alert-blue">Não Pago</span></p>
                 @else
                 <span class="alert-{{$statusColor[$payment->status] ?? 'info'}}">{{ __('payments.status.' . $payment->status)}}</span></p>

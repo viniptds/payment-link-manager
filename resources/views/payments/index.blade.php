@@ -57,7 +57,7 @@ $statusColor = [
                               </div>
                             <td>{{ $payment->description }}
                             <td>R$ {{ str_replace('.', ',', sprintf ("%.2f", $payment->value)) }}</td>
-                            @if ($payment->status == 'active' && $payment->gatewayOperations)
+                            @if ($payment->status == 'active' && $payment->gatewayOperations->count())
                             <td> <p class="text-center alert-blue">Não Pago</p></td>
                             @else
                             <td> <p class="text-center alert-{{$statusColor[$payment->status] ?? 'info'}}">{{ __('payments.status.' . $payment->status) }}</p></td>
