@@ -51,6 +51,10 @@ details > summary::-webkit-details-marker {
   @apply bg-yellow-500 text-white py-1 px-2 rounded text-sm m-4;
 }
 
+.alert-warning {
+  @apply bg-orange-500 text-white py-1 px-2 rounded text-sm m-4;
+}
+
 
 input.form-control  {
   @apply block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] transition-all duration-200 ease-linear focus:placeholder:opacity-100 data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-neutral-200 dark:placeholder:text-neutral-200 [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0;

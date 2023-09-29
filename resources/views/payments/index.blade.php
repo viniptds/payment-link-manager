@@ -5,10 +5,10 @@ $currentPage = 1;
 $hasMorePages = false;
 
 $statusColor = [
-  'paid' => 'success',
-  'active' => 'blue',
-  'cancelled' => 'red',
-  'expired' => 'yellow',
+    'paid' => 'success',
+    'active' => 'blue',
+    'cancelled' => 'red',
+    'expired' => 'yellow',
 ];
 ?>
 <x-app-layout>
@@ -44,32 +44,28 @@ $statusColor = [
                         <th class="">Valor</th>
                         <th class="">Status</th>
                         <th class="">Criado Em</th>
-                        <!-- <th>Criado Em</th> -->
+                        <th>Exipira Em</th>
                         <th>Ações</th>
                     </thead>
                     <tbody>
                         @foreach ($links as $payment)
-                        <tr class="p-5 m-10"> 
+                        <tr class="p-5 m-10">
                             <td>
-                              <div class="flex justify-between">
-                                <a href="{{url('/pay') . '/' . $payment->id}}" target="_blank"> {{ $payment->id }}</a> 
+                              <div class="flex">
+                                <a class="btn btn-blue mr-3" href="{{url('/pay') . '/' . $payment->id}}" target="_blank"> Abrir </a>
                                 <button type="button" class="btn-copy btn btn-blue mr-3" data-content="{{url('/pay') . '/' . $payment->id}}">Copiar</button>
                               </div>
                             <td>{{ $payment->description }}
                             <td>R$ {{ str_replace('.', ',', sprintf ("%.2f", $payment->value)) }}</td>
                             @if ($payment->status == 'active' && $payment->gatewayOperations->count())
-                            <td> <p class="text-center alert-blue">Não Pago</p></td>
+                            <td> <p class="text-center alert-warning">Não Pago</p></td>
                             @else
                             <td> <p class="text-center alert-{{$statusColor[$payment->status] ?? 'info'}}">{{ __('payments.status.' . $payment->status) }}</p></td>
                             @endif
                             <td>{{ date('d/m/Y H:i:s', strtotime($payment->created_at)) }}</td>
-                            <td><a href="{{url('/payments/' . $payment->id )}}">Ver</a> 
-                              @if(in_array($payment->status, ['active', 'inactive'])) 
-                              | <a href="{{url('/payments/' . $payment->id . '/toggle-active')}}"> {{ $payment->status == 'active' ? 'Desativar' : 'Ativar'}} </a>
-                              @endif
-                              <!-- @if ($payment->status == 'cancelled')
-                              <a href="{{url('/payments/' . $payment->id . '/delete')}}"> Remover</a> | 
-                              @endif -->
+                            <td>{{ $payment->expire_at ? date('d/m/Y H:i:s', strtotime($payment->expire_at)): 'Indeterminado' }}</td>
+                            <td>
+                              <a class="btn btn-info" href="{{url('/payments/' . $payment->id )}}">Ver</a>
                             </td>
                         </tr>
                         @endforeach
@@ -85,7 +81,7 @@ $statusColor = [
                       >{{__('Previous')}}</a
                     >
                   </li>
-                 
+
                   @endif
                   @for ($i = 1; $i <= $pages; $i++)
                   <li aria-current="page">
@@ -171,7 +167,7 @@ $statusColor = [
                 <label>Número de Parcelas</label>
                 <select class="form-control" name='max_installments' id='maxInstallmentsSelect'></select>
               </div>
-        </div>  
+        </div>
 
         <!--Modal footer-->
         <div

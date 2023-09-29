@@ -108,7 +108,7 @@ class PaymentController extends Controller
                 break;
         }
 
-        return redirect('payments');
+        return redirect('payments/' . $payment->id);
     }
 
     public function markAsPaid(Payment $payment, Request $request)

@@ -39,7 +39,7 @@ $customer = $payment->customer ?? false;
                 <p class='mb-4'>Descrição: {{$payment->description}}</p>
                 <p class='mb-4'>Status: 
                 @if ($payment->status == 'active' && $payment->gatewayOperations->count())
-                <span class="alert-blue">Não Pago</span></p>
+                <span class="alert-warning">Não Pago</span></p>
                 @else
                 <span class="alert-{{$statusColor[$payment->status] ?? 'info'}}">{{ __('payments.status.' . $payment->status)}}</span></p>
                 @endif
@@ -71,6 +71,11 @@ $customer = $payment->customer ?? false;
                       </div>
                       @endif
                     @endif
+                  @endif
+                  @if(Auth::user()->is_admin && in_array($payment->status, ['active', 'inactive']))
+                  <div class="my-5 mr-3">
+                    <a href="{{url('/payments/' . $payment->id . '/toggle-active')}}" class="btn btn-{{$payment->status == 'active' ? 'info' : 'success'}}"> {{ $payment->status == 'active' ? 'Desativar' : 'Ativar'}} </a>
+                  </div>
                   @endif
                   @if ($payment->status == 'active')
                   <div class="my-5 mr-3">
