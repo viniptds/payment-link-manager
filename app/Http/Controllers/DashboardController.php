@@ -17,8 +17,22 @@ class DashboardController extends Controller
      */
     public function index(Request $request): View
     {
-       
-        return view('dashboard');
+        $payments = Payment::select()->count();
+        $paid = Payment::select()->where('status', Payment::STATUS_PAID)->count();
+        $expired = Payment::select()->where('status', Payment::STATUS_EXPIRED)->count();
+        $canceled = Payment::select()->where('status', Payment::STATUS_CANCELLED)->count();
+        $active = Payment::select()->where('status', Payment::STATUS_ACTIVE)->count();
+        $inactive = Payment::select()->where('status', Payment::STATUS_INACTIVE)->count();
+
+        $data = [
+            'payments' => $payments,
+            'paid' => $paid,
+            'expired' => $expired,
+            'canceled' => $canceled,
+            'active' => $active,
+            'inactive' => $inactive,
+        ];
+        return view('dashboard')->with('data', $data);
     }
     /**
      * Display the user's profile form.
