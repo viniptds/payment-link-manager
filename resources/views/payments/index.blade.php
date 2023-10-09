@@ -51,8 +51,8 @@ $statusColor = [
                         @foreach ($links as $payment)
                         <tr class="p-5 m-10">
                             <td>
-                              <div class="flex">
-                                <a class="btn btn-blue mr-3" href="{{url('/pay') . '/' . $payment->id}}" target="_blank"> Abrir </a>
+                              <div class="flex justify-between">
+                              <a href="{{url('/pay') . '/' . $payment->id}}" target="_blank"> {{ $payment->id }}</a> 
                                 <button type="button" class="btn-copy btn btn-blue mr-3" data-content="{{url('/pay') . '/' . $payment->id}}">Copiar</button>
                               </div>
                             <td>{{ $payment->description }}
