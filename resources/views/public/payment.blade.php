@@ -30,7 +30,7 @@ $page = $_GET['page'] ?? 'home';
                 </li>
                 <li role="presentation" class="flex-grow basis-0 text-center">
                     <a
-                    class="cursor-pointer my-2 block border-x-0 border-b-2 border-t-0 border-transparent px-7 pb-3.5 pt-4 text-xs font-medium uppercase leading-tight text-neutral-500 hover:isolate hover:border-transparent hover:bg-neutral-100 focus:isolate focus:border-transparent data-[te-nav-active]:border-primary data-[te-nav-active]:text-primary dark:text-neutral-400 dark:hover:bg-transparent dark:data-[te-nav-active]:border-primary-400 dark:data-[te-nav-active]:text-primary-400 {{$page == 'personal' ? 'shadow-[0_4px_9px_-4px_#3b71ca]' : ''}}" 
+                    class="cursor-pointer my-2 block border-x-0 border-b-2 border-t-0 border-transparent px-7 pb-3.5 pt-4 text-xs font-medium uppercase leading-tight text-neutral-500 hover:isolate hover:border-transparent hover:bg-neutral-100 focus:isolate focus:border-transparent data-[te-nav-active]:border-primary data-[te-nav-active]:text-primary dark:text-neutral-400 dark:hover:bg-transparent dark:data-[te-nav-active]:border-primary-400 dark:data-[te-nav-active]:text-primary-400 {{$page == 'personal' ? 'shadow-[0_4px_9px_-4px_#3b71ca]' : ''}}"
                     onclick="setTab('personal')"
                     >Dados Pessoais</a
                     >
@@ -61,17 +61,17 @@ $page = $_GET['page'] ?? 'home';
                 aria-labelledby="tab-home-tab">
                     <h1 class="text-bold text-xl">Resumo do Checkout</h1>
                     <div class="my-4">
-                        <label class="label-control">Recebedor</label> 
+                        <label class="label-control">Recebedor</label>
                         <input class="form-control" readonly value="{{env('APP_NAME')}}">
                     </div>
 
                     <div class="my-4">
-                        <label class="label-control">Item</label> 
+                        <label class="label-control">Item</label>
                         <input class="form-control" readonly value="{{$payment->description}}">
                     </div>
 
                     <div class="my-4">
-                        <label class="label-control">Valor</label> 
+                        <label class="label-control">Valor</label>
                         <input class="form-control" readonly value='R$ {{str_replace(".", ",", sprintf("%.2f", $payment->value))}}'>
                     </div>
                     <div class="flex bg-white sm:rounded-lg justify-end ">
@@ -98,7 +98,7 @@ $page = $_GET['page'] ?? 'home';
                     </div>
                     <div class="my-4">
                         <label class="label-control">CPF</label>
-                        <input class="form-control" type="text" name="cpf" id="payment-document" placeholder="000.000.000-00" value="{{old('cpf') ?? $customer->cpf ?? ''}}">
+                        <input class="form-control cpf-mask" type="text" name="cpf" id="payment-cpf" placeholder="000.000.000-00" maxlength="14" value="{{old('cpf') ?? $customer->cpf ?? ''}}">
                     </div>
                     <div class="my-4">
                         <label class="label-control">Nº OAB</label>
@@ -119,18 +119,18 @@ $page = $_GET['page'] ?? 'home';
                 @if (session('cardMessage'))
                 <div class="p-4">
                     {{session('cardMessage')}}
-                </div> 
+                </div>
                 @endif
                 <form action="{{ $payment->id . '/checkout'}}" method="post">
                     <input type="hidden" name="customer_id" id="cardInfo-customerId" value="{{$customer->id ?? ''}}">
                     <div class="my-4">
                         <label class="label-control">Número do Cartão</label>
-                        <input class="form-control" type="number" name="card_number" id="cardInfo-cardNumber" placeholder="0000 0000 0000 0000" value="{{old('card_number')}}">
+                        <input class="form-control card-mask" type="text" name="card_number" id="cardInfo-cardNumber" maxlength='19' placeholder="0000 0000 0000 0000" value="{{old('card_number')}}">
                     </div>
 
                     <div class="my-4">
                         <label class="label-control">CVV</label>
-                        <input class="form-control" type="number" maxlength='3' name="card_cvv" id="cardInfo-cvv" placeholder="000">
+                        <input class="form-control number-mask" type="text" maxlength='3' name="card_cvv" id="cardInfo-cvv" placeholder="000">
                     </div>
                     <div class="my-4">
                         <label class="label-control" for="card_brand" class="">Bandeira</label>
@@ -153,7 +153,7 @@ $page = $_GET['page'] ?? 'home';
                         @endfor
                         </select>
                     </div>
-                    
+
                     <div class="my-4">
                         <label class="label-control" >Validade</label>
                         <input class="form-control" type="month" maxlength=3 name="card_expiration_date" id="cardInfo-expiration_date" value="{{old('card_expiration_date')}}">
@@ -164,7 +164,7 @@ $page = $_GET['page'] ?? 'home';
 
                         <input class="form-control" type="text" name="card_holder" id="cardInfo-name" placeholder="João da Silva" value="{{old('card_holder')}}">
                     </div>
-                    
+
                     <div class="flex bg-white sm:rounded-lg justify-end ">
                         <button class="btn btn-success" type="submit" id="btnPay">Pagar</button>
                     </div>
@@ -178,6 +178,7 @@ $page = $_GET['page'] ?? 'home';
 
 
 @section('js')
+<script src="{{url('./util/mask.js')}}"></script>
 <script>
     function redirectToPage() {
         const urlParams = new URLSearchParams(window.location.search);
@@ -202,7 +203,7 @@ $page = $_GET['page'] ?? 'home';
                 tab.classList.remove('opacity-100');
                 tab.classList.add('opacity-0');
             })
-    
+
             selectedTab.setAttribute('data-te-tab-active', '');
             selectedTab.classList.remove('opacity-0');
             selectedTab.classList.add('opacity-100');

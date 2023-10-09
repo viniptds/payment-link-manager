@@ -224,6 +224,7 @@ return [
         'payment_installments' => 'número de parcelas',
         'customer_id' => 'dados do cliente',
         'expire_at' => 'data de expiração',
+        'document' => 'documento',
 
         'cpf' => 'CPF'
     ],

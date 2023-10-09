@@ -41,6 +41,8 @@ class PublicPaymentController extends Controller
             $customer = new Customer();
         }
 
+        $data['cpf'] = preg_replace('/[^0-9]/', '', $data['cpf']);
+
         $customer->email = $data['email'];
         $customer->name = $data['name'];
         $customer->cpf = $data['cpf'];
@@ -48,7 +50,6 @@ class PublicPaymentController extends Controller
         $customer->save();
 
         $payment->customer_id = $customer->id;
-        // $payment->curr_step = Payment::STEP_CARD;
         $payment->save();
 
         return redirect('/pay/' . $payment->id . '?page=card')->with('customer', $customer);
@@ -78,13 +79,13 @@ class PublicPaymentController extends Controller
                 'cvv' => $data['card_cvv'],
                 'brand' => $data['card_brand'],
                 'expiration_date' => date('m/Y', strtotime($data['card_expiration_date'])),
-                'number' => $data['card_number'],
+                'number' => filter_var($data['card_number'], FILTER_SANITIZE_NUMBER_INT),
                 'holder' => $data['card_holder']
             ];
-            // $customer = $payment->customer;
+            $customer = $payment->customer;
 
             $cieloHelper = new CieloGatewayHelper($payment->id);
-            $cieloHelper->setCustomer($card['holder']);
+            $cieloHelper->setCustomer($card['holder'], $customer->cpf);
 
             $cieloHelper->setPayment($payment->value, $data['payment_installments']);
 
