@@ -85,7 +85,7 @@ class PublicPaymentController extends Controller
             $customer = $payment->customer;
 
             $cieloHelper = new CieloGatewayHelper($payment->id);
-            $cieloHelper->setCustomer($card['holder'], $customer->cpf);
+            $cieloHelper->setCustomer($card['holder'], preg_replace('/[^0-9]/', '', $customer->cpf));
 
             $cieloHelper->setPayment($payment->value, $data['payment_installments']);
 
