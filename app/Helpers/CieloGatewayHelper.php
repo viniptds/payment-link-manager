@@ -31,10 +31,15 @@ class CieloGatewayHelper {
         $this->maxInstallments = env('CIELO_MAX_INSTALLMENTS', 12);
     }
 
-    public function setCustomer($customerName)
+    public function setCustomer($customerName, $customerCpf = '')
     {
         if (!empty($customerName)) {
             $this->sale->customer($customerName);
+        }
+
+        if (!empty($customerCpf)) {
+            $this->sale->getCustomer()->setIdentity($customerCpf);
+            $this->sale->getCustomer()->setIdentityType('CPF');
         }
     }
 
