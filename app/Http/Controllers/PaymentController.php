@@ -154,11 +154,11 @@ class PaymentController extends Controller
                     $gatewayOperation->gateway = 'CIELO30';
                     $gatewayOperation->type = GatewayOperation::VOID_OPERATION;
                     $gatewayOperation->status = false;
+                    $gatewayOperation->log = json_encode($sale);
 
                     if (is_array($sale)) {
                         $response['message'] = $returnOptions[$sale['code']] ?? 'Falha no cancelamento do pagamento.';
                         $sale['response'] = $response['message'];
-                        $gatewayOperation->log = json_encode($sale);
 
                     } else {
                         $status = $sale->getStatus();
@@ -171,7 +171,6 @@ class PaymentController extends Controller
                                 $payment->status = Payment::STATUS_CANCELLED;
                                 $payment->save();
 
-                                $gatewayOperation->log = json_encode($sale);
                                 $gatewayOperation->status = true;
                                 
                                 $response['message'] = 'O pagamento foi cancelado e estornado com sucesso.';

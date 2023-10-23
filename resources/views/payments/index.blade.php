@@ -153,7 +153,7 @@ $statusColor = [
               @csrf
               <div class="mb-2">
                 <label for="valueInput" >Valor de Pagamento *</label>
-                <input class='form-control' id='valueInput' name='value' type="number" step="0.01" min="50" title="Valor mínimo de R$ 50,00" onkeyup="updateInstallments(this, 'maxInstallmentsSelect')" required>
+                <input class='form-control' id='valueInput' name='value' type="number" step="0.01" min="{{env('CIELO_MIN_INSTALLMENT_VALUE', 50)}}" title="Valor mínimo de R$ 50,00" onkeyup="updateInstallments(this, 'maxInstallmentsSelect')" required>
               </div>
               <div class="mb-2">
                 <label>Descrição *</label>
