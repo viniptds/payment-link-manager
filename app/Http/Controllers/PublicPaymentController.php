@@ -64,7 +64,7 @@ class PublicPaymentController extends Controller
             'card_holder' => 'required',
             'card_brand' => 'required',
             'card_expiration_date' => 'required|after_or_equal:now',
-            'card_cvv' => 'required|integer|min_digits:3|max_digits:3',
+            'card_cvv' => 'required|numeric|min_digits:3|max_digits:3',
             'payment_installments' => 'required',
             'customer_id' => 'required|exists:customers,id'
         ]);

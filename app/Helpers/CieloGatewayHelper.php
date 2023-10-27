@@ -93,7 +93,7 @@ class CieloGatewayHelper {
     {
         // Aplica o estorno no gateway
         try {
-            Log::debug('Cancelling sale on Cielo...');
+            Log::debug('Voiding sale on Cielo...');
             Log::debug('Payment ID: ' . $paymentId);
 
             $sale = (new CieloEcommerce($this->merchant, $this->environment))->cancelSale($paymentId, $amount * 100);
