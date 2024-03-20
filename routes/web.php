@@ -6,6 +6,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PublicPaymentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -55,6 +56,12 @@ Route::middleware('auth')->group(function () {
     Route::prefix('customers')->group(function() {
         Route::get('/', [CustomerController::class, 'index'])->name('customers');
         Route::get('/{customer}', [CustomerController::class, 'show'])->name('customers.show');
+    });
+
+    Route::prefix('settings')->group(function() {
+        Route::get('/', [SettingsController::class, 'index'])->name('settings.index');
+        Route::post('/{setting}', [SettingsController::class, 'update'])->name('settings.update');
+        Route::get('/restore-from-factory', [SettingsController::class, 'restoreFromFactory'])->name('settings.restore-from-factory');
     });
 
     Route::prefix('users')->group(function() {
