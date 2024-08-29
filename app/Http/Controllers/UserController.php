@@ -13,7 +13,7 @@ class UserController extends Controller
     {
         $users = [];
         if ($request->user()->is_admin) {
-            $users = User::select()->orderByDesc('created_at')->get();
+            $users = User::select()->orderByDesc('created_at')->paginate(15);
         }
 
         return view('users.index', [

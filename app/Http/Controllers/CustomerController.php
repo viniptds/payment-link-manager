@@ -3,13 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
-use Illuminate\Http\Request;
 
 class CustomerController extends Controller
 {
     function index()
     {
-        $customers = Customer::select()->orderByDesc('created_at')->get();
+        $customers = Customer::select()->orderByDesc('created_at')->paginate(15);
         return view('customers.index')->with('customers', $customers);
     }
 

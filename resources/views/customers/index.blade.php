@@ -1,9 +1,3 @@
-<?php
-
-$pages = 1;
-$currentPage = 1;
-$hasMorePages = false;
-?>
 <x-app-layout>
     <x-slot name="header">
       <div class="flex justify-between vertical-align-center">
@@ -50,38 +44,9 @@ $hasMorePages = false;
                         @endforeach
                     </tbody>
                 </table>
-                <nav aria-label="" class='flex justify-center mt-5'>
-                <ul class="list-style-none flex">
-                  @if($currentPage > $pages)
-                  <li>
-                    <a
-                      class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                      href="{{url('payments?page=' . ($i - 1))}}"
-                      >{{__('Previous')}}</a
-                    >
-                  </li>
-                 
-                  @endif
-                  @for ($i = 1; $i <= $pages; $i++)
-                  <li aria-current="page">
-                    <a
-                      class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                      href="{{url('payments?page=' . $i)}}"
-                      >{{$i}}</a
-                    >
-                  </li>
-                  @endfor
-                  @if($currentPage < $pages)
-                  <li>
-                    <a
-                      class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                      href="#"
-                      >{{__('Next')}}</a
-                    >
-                  </li>
-                  @endif
-                </ul>
-              </nav>
+
+                {!! $customers->links('util.paginator')!!}
+
             </div>
         </div>
     </div>

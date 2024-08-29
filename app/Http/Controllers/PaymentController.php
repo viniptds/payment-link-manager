@@ -13,11 +13,13 @@ class PaymentController extends Controller
 {
     public function index(Request $request) 
     {
-        if ($request->user()->is_admin) {
-            $links = Payment::select()->orderByDesc('created_at')->get();
-        } else {
-            $links = Payment::select()->where('created_by', $request->user()->id)->orderByDesc('created_at')->get();
+        $links = Payment::select();
+        
+        if (!$request->user()->is_admin) {
+            $links = Payment::select()->where('created_by', $request->user()->id);
         }
+
+        $links = $links->orderByDesc('created_at')->paginate(10);
 
         return view('payments.index', [
             'links' => $links,

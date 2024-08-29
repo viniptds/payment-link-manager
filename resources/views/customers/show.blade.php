@@ -12,14 +12,13 @@ $parseStatus = [
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Cliente') . ' - ' . $customer->name}}
+            <a href="{{url('/customers')}}">{{ __('Clientes')}} </a> / {{ $customer->name}}
         </h2>
     </x-slot>
 
     <div class="py-5">
       <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div class="flex flex-col pb-5">
-          <p><a class="btn btn-blue" href="{{url('/customers')}}">Voltar para Clientes</a></p>
           <h1 class="text-lg font-bold pt-7">Informações do Pagador</h1>
 
         </div>

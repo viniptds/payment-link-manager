@@ -21,14 +21,13 @@ $customer = $payment->customer ?? false;
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Link de Pagamento')}} - <a href="{{url('pay/' . $payment->id)}}" target="_blank">{{$payment->id}}</a>
+            <a href="{{url('/payments')}}">{{ __('payment_links_header') }}</a> / <a href="{{url('pay/' . $payment->id)}}" target="_blank">{{$payment->id}}</a>
         </h2>
     </x-slot>
 
     <div class="py-5">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="flex flex-col pb-5">
-                <p><a class="btn btn-blue" href="{{url('/payments')}}">Voltar para Pagamentos</a></p>
                 <h1 class="text-lg font-bold pt-7">Informações do Link</h1>
 
             </div>
