@@ -5,6 +5,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PublicPaymentController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\GatewayController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Route;
@@ -25,7 +26,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::prefix('pay')->group(function() {
+Route::prefix('pay')->group(function () {
     Route::get('/{payment}', [PublicPaymentController::class, 'show'])->name('public.payment');
     Route::post('/{payment}/personal', [PublicPaymentController::class, 'personal']);
     Route::post('/{payment}/checkout', [PublicPaymentController::class, 'checkout']);
@@ -33,16 +34,16 @@ Route::prefix('pay')->group(function() {
 });
 
 Route::middleware('auth')->group(function () {
-    Route::prefix('profile')->group(function() {
+    Route::prefix('profile')->group(function () {
         Route::get('/', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::get('/toggle-admin', [ProfileController::class, 'toggleAdmin'])->name('profile.toggleAdmin');
         Route::patch('/', [ProfileController::class, 'update'])->name('profile.update');
         Route::delete('/', [ProfileController::class, 'destroy'])->name('profile.destroy');
     });
-    
+
     Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['verified'])->name('dashboard');
 
-    Route::prefix('payments')->group(function() {
+    Route::prefix('payments')->group(function () {
         Route::get('/', [PaymentController::class, 'index'])->name('payments');
         Route::get('/{payment}', [PaymentController::class, 'show'])->name('payment.show');
         Route::patch('/{payment}', [PaymentController::class, 'update'])->name('payment.update');
@@ -53,18 +54,23 @@ Route::middleware('auth')->group(function () {
         Route::post('/', [PaymentController::class, 'store']);
     });
 
-    Route::prefix('customers')->group(function() {
+    Route::prefix('customers')->group(function () {
         Route::get('/', [CustomerController::class, 'index'])->name('customers');
         Route::get('/{customer}', [CustomerController::class, 'show'])->name('customers.show');
     });
 
-    Route::prefix('settings')->group(function() {
+    Route::prefix('settings')->group(function () {
         Route::get('/', [SettingsController::class, 'index'])->name('settings.index');
         Route::post('/{setting}', [SettingsController::class, 'update'])->name('settings.update');
         Route::get('/restore-from-factory', [SettingsController::class, 'restoreFromFactory'])->name('settings.restore-from-factory');
+
+        Route::prefix('gateways')->group(function () {
+            Route::get('/', [GatewayController::class, 'index'])->name('settings.gateways');
+            Route::post('/{gateway}', [GatewayController::class, 'update'])->name('settings.gateways.update');
+        });
     });
 
-    Route::prefix('users')->group(function() {
+    Route::prefix('users')->group(function () {
         Route::get('/', [UserController::class, 'index'])->name('users');
         Route::get('/{user}', [UserController::class, 'show'])->name('users.show');
         Route::get('/{user}/toggle-admin', [UserController::class, 'toggleAdmin'])->name('users.toggle-admin');
@@ -72,4 +78,4 @@ Route::middleware('auth')->group(function () {
     });
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

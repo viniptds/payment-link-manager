@@ -1,21 +1,5 @@
 <x-app-layout>
-    <x-slot name="header">
-        <div class="flex justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight content-center flex flex-wrap">
-                {{ __('Settings') }}
-            </h2>
-            <a class="btn btn-blue text-lg font-bold confirm-restore-option" href="{{route('settings.restore-from-factory')}}">Restaurar configuração de fábrica</a>
-        </div>
-        @if($errors->all())
-        <div>
-            <ul>
-            @foreach ($errors->all() as $error)
-            <li>{{$error}}</li>
-            @endforeach
-            </ul>
-        </div>
-      @endif
-    </x-slot>
+    @include('settings.header')
 
     <div class="py-5">
         <div class="max-w-7lg mx-auto sm:px-6 lg:px-8">

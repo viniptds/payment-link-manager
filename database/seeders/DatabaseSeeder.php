@@ -45,5 +45,8 @@ class DatabaseSeeder extends Seeder
             'value' => 'logo.png',
             'updated_by' => $adminUser->id
         ]);
+
+        $gatewaySeeder = new GatewaySeeder;
+        $gatewaySeeder->run();
     }
 }
