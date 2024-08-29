@@ -23,7 +23,9 @@ class SettingsServiceProvider extends ServiceProvider
     {
         $settings = $cache->remember('settings', 60, function() use ($settings)
         {
-            return $settings->pluck('value', 'id')->all();
+            // TODO: check if this works when no setting is placed
+            $return = $settings->pluck('value', 'id')->all();
+            return $return;
         });
 
         config()->set('settings', $settings);

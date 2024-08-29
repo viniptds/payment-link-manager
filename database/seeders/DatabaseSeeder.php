@@ -13,8 +13,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        
-        \App\Models\User::factory()->create([
+
+        $adminUser = \App\Models\User::factory()->create([
             'name' => 'Admin User',
             'email' => 'admin@example.com',
             'is_admin' => true,
@@ -27,18 +27,23 @@ class DatabaseSeeder extends Seeder
             'is_admin' => false,
             'password' => Hash::make('123123123'),
         ]);
-        
+
         \App\Models\User::factory(10)->create();
 
         \App\Models\Payment::factory(10)->create();
         \App\Models\Payment::factory()->count(3)->for(\App\Models\Customer::factory()->state([
             'name' => 'Vinicius'
         ]))->create();
-        
+
         \App\Models\Payment::factory()->count(3)->create([
             'created_by' => $basicUser->id
         ]);
 
-        
+
+        \App\Models\Settings::factory()->create([
+            'id' => 'logo_main',
+            'value' => 'logo.png',
+            'updated_by' => $adminUser->id
+        ]);
     }
 }

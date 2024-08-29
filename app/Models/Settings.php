@@ -9,6 +9,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Settings extends Model
 {
     use HasFactory;
+
+    const TYPE_DATE = 'date';
+    const TYPE_STRING = 'string';
+    const TYPE_NUMBER = 'number';
+    const TYPE_CUSTOM = 'custom';
+
+    const DATA_TYPES = [
+        self::TYPE_DATE,
+        self::TYPE_STRING,
+        self::TYPE_CUSTOM,
+        self::TYPE_NUMBER
+    ];
+
     
     const APP_NAME = 'app_name';
     const LOGO_MAIN = 'logo_main';
