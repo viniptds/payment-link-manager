@@ -39,7 +39,6 @@ class DatabaseSeeder extends Seeder
             'created_by' => $basicUser->id
         ]);
 
-
         \App\Models\Settings::factory()->create([
             'id' => 'logo_main',
             'value' => 'logo.png',

@@ -9,7 +9,7 @@ class Gateway extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'status'];
+    protected $fillable = ['name', 'description', 'status', 'photo', 'credentials'];
 
     public function transactions() {
         return $this->hasMany(Payment::class);

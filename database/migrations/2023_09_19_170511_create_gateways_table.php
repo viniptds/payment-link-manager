@@ -14,7 +14,11 @@ return new class extends Migration
         Schema::create('gateways', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('description')->nullable();
+            $table->string('photo')->nullable();
             $table->boolean('status');
+            $table->string('credentials')->nullable();
+            
             // $table->string('settings');
             $table->timestamps();
         });

@@ -5,7 +5,14 @@ $statusColor = [
     'active' => 'blue',
     'cancelled' => 'red',
     'expired' => 'yellow',
+    'pending' => 'warning'
 ];
+
+// $dateRanges = [
+//   'today',
+//   'yesterday',
+//   '7'
+// ];
 ?>
 <x-app-layout>
     <x-slot name="header">
@@ -18,6 +25,26 @@ $statusColor = [
                 data-te-target="#createLinkModal"
                 data-te-ripple-init
                 data-te-ripple-color="light">Novo Link de Pagamento</button>
+      </div>
+      <div class="filters flex">
+
+        <label class="px-3">
+          Busca (Nome, Descrição)
+          <input type="text" class="form-control" id="filter_search" title="Nome, Descrição">
+        </label>
+
+        <label class="px-3">
+          Status
+          <select class="form-control " id="filter_status">
+            <option value="">Selecione</option>
+            @foreach (array_keys($statusColor) as $status)
+            <option value="{{$status}}">{{$status}}</option>
+            @endforeach
+          </select>
+        </label>
+
+
+        <button type="button" id="searchLinks" class="btn btn-success">Buscar</button>
       </div>
       @if($errors->all())
       <div>
@@ -120,7 +147,9 @@ $statusColor = [
               @csrf
               <div class="mb-2">
                 <label for="valueInput" >Valor de Pagamento *</label>
-                <input class='form-control' id='valueInput' name='value' type="number" step="0.01" min="{{env('CIELO_MIN_INSTALLMENT_VALUE', 50)}}" title="Valor mínimo de R$ 50,00" onkeyup="updateInstallments(this, 'maxInstallmentsSelect')" required>
+                <input class='form-control' id='valueInput' name='value' type="number" step="0.01" min="0.01" 
+                {{-- min="{{env('CIELO_MIN_INSTALLMENT_VALUE', 50)}}"  --}}
+                title="Valor mínimo de R$ 50,00" onkeyup="updateInstallments(this, 'maxInstallmentsSelect')" required>
               </div>
               <div class="mb-2">
                 <label>Descrição *</label>
@@ -130,10 +159,10 @@ $statusColor = [
                 <label>Válido até</label>
                 <input class="form-control" name='expire_at' id='expireAtInput' type="datetime-local">
               </div>
-              <div class="mb-2">
+              {{-- <div class="mb-2">
                 <label>Número de Parcelas</label>
                 <select class="form-control" name='max_installments' id='maxInstallmentsSelect'></select>
-              </div>
+              </div> --}}
         </div>
 
         <!--Modal footer-->
@@ -184,6 +213,14 @@ $statusColor = [
       element.classList.add('btn-blue');
       element.classList.remove('btn-success');
     }
+
+    document.querySelector('#searchLinks').addEventListener('click', function(e) {
+      let route = '{{route("payments")}}';
+
+      let filterStatus = document.querySelector('#filter_status').value;
+      let filterSearch = document.querySelector('#filter_search').value;
+      alert('TODO: make filter work');
+    })
 </script>
 @endsection
 </x-app-layout>

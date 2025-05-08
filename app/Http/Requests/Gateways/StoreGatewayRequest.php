@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Gateways;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -11,7 +11,7 @@ class StoreGatewayRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,14 @@ class StoreGatewayRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => 'required|string|unique:gateways,name',
+            'description' => 'required|string',
+            'photo' => 'nullable',
+            'credentials.*' => 'nullable|array',
+            'credentials.label' => 'nullable|array',
+            'credentials.label.*' => 'nullable|string',
+            'credentials.value' => 'nullable|array',
+            'credentials.value.*' => 'nullable|string',
         ];
     }
 }

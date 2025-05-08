@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Traits\UUID;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Payment extends Model
 {
@@ -17,6 +19,7 @@ class Payment extends Model
     const STATUS_EXPIRED = 'expired';
     const STATUS_PAID = 'paid';
     const STATUS_CANCELLED = 'cancelled';
+    const STATUS_PENDING = 'pending';
 
     protected $fillable = [
         'id', 'value', 'description', 'status', 'max_installments', 'created_by', 'expire_at', 'cancelled_at', 'paid_at'
@@ -30,6 +33,12 @@ class Payment extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by', 'id');
+    }
+
+    public function gateways(): BelongsToMany
+    {
+        // return $this->hasManyThrough(Gateway::class, 'payment_gateways');
+        return $this->belongsToMany(Gateway::class, 'payment_gateways');
     }
 
     public function gatewayOperations(): HasMany

@@ -11,8 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->boolean('is_admin')->default(false);
+        Schema::create('payment_gateways', function (Blueprint $table) {
+            $table->id();
+
+            $table->foreignUuid('payment_id')->references('id')->on('payments');
+            $table->foreignId('gateway_id')->references('id')->on('gateways');
+            
+            $table->timestamps();
         });
     }
 
@@ -21,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('payment_gateways');
     }
 };

@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('gateway_operations', function (Blueprint $table) {
             $table->uuid('id')->primary('id');
-            $table->foreignUuid('payment_id')->references('id')->on('payments')->onDelete('cascade');
             $table->text('log');
             $table->string('type');
             $table->boolean('status');
-            $table->string('gateway');
-
+            
+            $table->foreignId('gateway_id')->references('id')->on('gateways')->onDelete('cascade');
+            $table->foreignUuid('payment_id')->references('id')->on('payments')->onDelete('cascade');
             $table->timestamps();
         });
     }

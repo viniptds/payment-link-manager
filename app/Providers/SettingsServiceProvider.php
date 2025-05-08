@@ -21,10 +21,13 @@ class SettingsServiceProvider extends ServiceProvider
      */
     public function boot(Factory $cache, Settings $settings): void
     {
-        $settings = $cache->remember('settings', 60, function() use ($settings)
-        {
+        $settings = $cache->remember('settings', 60, function () use ($settings) {
             // TODO: check if this works when no setting is placed
             $return = $settings->pluck('value', 'id')->all();
+
+            if (empty($return)) {
+                $return = $settings->getFactoryValues();
+            }
             return $return;
         });
 

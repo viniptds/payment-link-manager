@@ -1,1 +1,1 @@
-<img src="{{url(config('settings.logo_main', ''))}}" class="container h-full w-100" />
+<img src="{{url(config('settings.logo_main', ''))}}" class="{{$class}}" />

@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreGatewayRequest;
-use App\Http\Requests\UpdateGatewayRequest;
+use App\Http\Requests\Gateways\StoreGatewayRequest;
+use App\Http\Requests\Gateways\UpdateGatewayRequest;
 use App\Models\Gateway;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class GatewayController extends Controller
 {
@@ -14,7 +16,7 @@ class GatewayController extends Controller
     public function index()
     {
         $gateways = Gateway::all();
-        return view('settings.gateways', [ 'gateways' => $gateways]);
+        return view('settings.gateways', ['gateways' => $gateways]);
     }
 
     /**
@@ -22,7 +24,29 @@ class GatewayController extends Controller
      */
     public function store(StoreGatewayRequest $request)
     {
-        //
+        $data = $request->validated();
+
+        $gateway = new Gateway();
+
+        $gateway->name = $data['name'];
+        $gateway->description = $data['description'] ?? '';
+
+        // TODO: handle photo upload
+        // $gateway->photo = $data['photo'];
+
+        if (!empty($data['credentials'])) {
+            $credentials = array_map(function ($item, $key) {
+                return "$item=$key";
+            }, $data['credentials']['label'], $data['credentials']['value']);
+
+            $gateway->credentials = implode(',', $credentials ?? []);
+        }
+
+        $gateway->status = 1;
+
+        $gateway->save();
+
+        return redirect('settings/gateways/' . $gateway->id);
     }
 
     /**
@@ -30,7 +54,7 @@ class GatewayController extends Controller
      */
     public function show(Gateway $gateway)
     {
-        //
+        return view('settings.gateways.show')->with('gateway', $gateway);
     }
 
     /**

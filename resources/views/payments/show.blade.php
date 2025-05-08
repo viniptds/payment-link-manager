@@ -12,7 +12,6 @@ $statusColor = [
   'cancelled' => 'red',
   'expired' => 'yellow',
 ];
-
 $hasPayment = ($payment->latestPayment->type ?? null) == 'pay';
 $transactions = $payment->gatewayOperations()->orderByDesc('created_at')->get()->all() ?? false;
 
@@ -110,6 +109,7 @@ $customer = $payment->customer ?? false;
                 @endif
             </div>
 
+
             @if ($customer)
             <div class="flex flex-col pb-5">
                 <h1 class="text-lg font-bold pt-7">Informações do Cliente</h1>
@@ -163,6 +163,34 @@ $customer = $payment->customer ?? false;
                     <option value='inactive' {{$payment->status == 'inactive' ? 'selected' : ''}}>{{__('payments.status.inactive')}}</option>
                   </select>
 
+                  <label>Atribuir cliente</label>
+                  <select class="form-control" name="customer_id">
+                    <option value="">Selecione</option>
+                    @foreach ($customers as $customer)
+                    <option value='{{$customer->id}}' {{$payment->customer_id == $customer->id ? 'selected' : ''}}>{{$customer->name}}</option>
+                    @endforeach
+                  </select>
+
+                  {{-- <input type="text" id="searchableGateway" class="form-control"> --}}
+                  <label>Atribuir gateway(s)</label>
+                  <div class="options">
+                    <input type="hidden" name="customer_id">
+                    <select class="form-control" name="gateway_ids[]" multiple>
+                      <option value="">Selecione</option>
+                      @foreach ($available_gateways as $gateway)
+                      <option value='{{$gateway->id}}' {{in_array($gateway->id, $payment->gateways->pluck('id')->toArray()) ? 'selected': ''}}>{{$gateway->name}}</option>
+                      @endforeach
+                    </select>
+                  </div>
+
+                  <div>
+                    <ul>
+                    @foreach ($errors->all() as $message)
+                      <li>{{$message}}</li>
+                    @endforeach
+                    </ul>
+                  
+                  </div>
                   <button type="submit" class="btn btn-blue mt-4" id="submitCreateLink">Salvar</button>
                 </form>
               </div>
