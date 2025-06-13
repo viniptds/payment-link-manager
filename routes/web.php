@@ -28,13 +28,13 @@ Route::get('/', function () {
 });
 
 // Route::prefix('pay')->group(function () {
-Route::prefix('pay-new')->group(function () {
-    Route::get('/{payment}', [NewPublicPaymentController::class, 'show'])->name('public.payment');
-    Route::post('/{payment}/personal', [NewPublicPaymentController::class, 'personal']);
-    Route::post('/{payment}/address', [PublicPaymentController::class, 'address']);
-    Route::post('/{payment}/checkout', [NewPublicPaymentController::class, 'checkout']);
-    Route::get('/{payment}/receipt', [NewPublicPaymentController::class, 'receipt']);
-});
+// Route::prefix('pay-new')->group(function () {
+//     Route::get('/{payment}', [NewPublicPaymentController::class, 'show'])->name('public.payment');
+//     Route::post('/{payment}/personal', [NewPublicPaymentController::class, 'personal']);
+//     Route::post('/{payment}/address', [PublicPaymentController::class, 'address']);
+//     Route::post('/{payment}/checkout', [NewPublicPaymentController::class, 'checkout']);
+//     Route::get('/{payment}/receipt', [NewPublicPaymentController::class, 'receipt']);
+// });
 
 Route::prefix('pay')->group(function () {
     Route::get('/{payment}', [PublicPaymentController::class, 'show'])->name('public.payment');
