@@ -26,7 +26,7 @@ COPY . .
 
 RUN chown -R unit:unit storage bootstrap/cache && chmod -R 775 storage bootstrap/cache
 
-RUN composer install --prefer-dist --optimize-autoloader --no-interaction
+RUN composer install --no-scripts --prefer-dist --optimize-autoloader --no-interaction
 
 COPY unit.json /docker-entrypoint.d/unit.json
 
