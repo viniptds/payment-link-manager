@@ -4,8 +4,9 @@ namespace App\Providers;
 
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Contracts\Cache\Factory;
-use App\Models\Settings;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+// use App\Models\Settings;
 
 class SettingsServiceProvider extends ServiceProvider
 {
@@ -20,26 +21,21 @@ class SettingsServiceProvider extends ServiceProvider
     /**
      * Bootstrap services.
      */
-    public function boot(Factory $cache, Settings $settings): void
+    public function boot(): void
     {
         if ($this->app->runningInConsole()) {
             return; // Skip during artisan commands like migrate
         }
 
-        // Check DB connection and table existence
-        $settings = $cache->remember('settings', 60, function () use ($settings) {
-            // TODO: check if this works when no setting is placed
-            $return = [];
-            if (Schema::hasTable('settings')) {
-                $return = $settings->pluck('value', 'id')->all();
-                
-                if (empty($return)) {
-                    $return = $settings->getFactoryValues();
-                }
-                return $return;
-            }
-        });
-        
-        config()->set('settings', $settings);
+        try {
+            $settings = Cache::rememberForever('app.settings', function () {
+                return DB::table('settings')->pluck('value', 'id')->toArray();
+            });
+
+            config()->set('settings', $settings);
+        } catch (\Throwable $e) {
+            // You can log this in development
+            // logger()->error('Settings load failed: ' . $e->getMessage());
+        }
     }
 }
