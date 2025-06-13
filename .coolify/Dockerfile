@@ -14,6 +14,7 @@ RUN echo "opcache.enable=1" > /usr/local/etc/php/conf.d/custom.ini \
     && echo "upload_max_filesize=64M" >> /usr/local/etc/php/conf.d/custom.ini \
     && echo "post_max_size=64M" >> /usr/local/etc/php/conf.d/custom.ini
 
+
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
 WORKDIR /var/www/html
@@ -28,6 +29,18 @@ RUN chown -R unit:unit /var/www/html/storage /var/www/html/bootstrap/cache \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
 RUN composer install --prefer-dist --optimize-autoloader --no-interaction
+
+
+# Install Node and dependencies
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs \
+    && npm install -g npm
+
+
+COPY package*.json ./
+RUN npm install
+
+RUN npm run build
 
 COPY unit.json /docker-entrypoint.d/unit.json
 
