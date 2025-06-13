@@ -27,18 +27,19 @@ class SettingsServiceProvider extends ServiceProvider
         }
 
         // Check DB connection and table existence
+        $settings = $cache->remember('settings', 60, function () use ($settings) {
+            // TODO: check if this works when no setting is placed
+            $return = [];
             if (Schema::hasTable('settings')) {
-                $settings = $cache->remember('settings', 60, function () use ($settings) {
-                // TODO: check if this works when no setting is placed
                 $return = $settings->pluck('value', 'id')->all();
-
+                
                 if (empty($return)) {
                     $return = $settings->getFactoryValues();
                 }
                 return $return;
-            });
-
-            config()->set('settings', $settings);
-        }
+            }
+        });
+        
+        config()->set('settings', $settings);
     }
 }
