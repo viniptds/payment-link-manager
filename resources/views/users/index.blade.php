@@ -31,7 +31,7 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-5">
                 <table id="links_table" class="w-full">
                     <thead class="py-5">
-                        <th class="">ID</th>
+                        <th class="hidden lg:block">ID</th>
                         <th class="">Nome</th>
                         <th class="">Email</th>
                         <th class="">Permissão</th>
@@ -42,7 +42,7 @@
                         @foreach ($users as $user)
                         <tr class="p-5 m-10"> 
                             
-                            <td>{{ $user->id }}
+                            <td class="hidden lg:block">{{ $user->id }}
                             <td>{{ $user->name }}
                             <td>{{ $user->email }}
                             <td>{{ $user->is_admin ? __('Admin') : __('User') }}

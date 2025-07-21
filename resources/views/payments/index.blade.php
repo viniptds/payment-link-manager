@@ -27,15 +27,15 @@ $searchQuery = request()->get('search', '');
             <button class="btn btn-blue text-lg font-bold " data-te-toggle="modal" data-te-target="#createLinkModal"
                 data-te-ripple-init data-te-ripple-color="light">Novo Link de Pagamento</button>
         </div>
-        <div class="filters flex mt-3 w-full">
+        <div class="filters flex mt-3 lg:w-full lg:flex-nowrap flex-wrap gap-5">
 
-            <label class="w-48">
+            <label class="lg:w-48 w-full">
                 Busca (Nome, Descrição)
                 <input type="text" class="form-control" id="filter_search" title="Nome, Descrição"
                     value="{{ $searchQuery }}">
             </label>
 
-            <label class="pl-5 flex flex-col w-48">
+            <label class="lg:w-48 w-full">
                 Status
                 <select class="form-control" id="filter_status">
                     <option value="">Selecione</option>
@@ -46,7 +46,7 @@ $searchQuery = request()->get('search', '');
                 </select>
             </label>
 
-            <div class="gap-2 align-center flex flex-wrap px-3">
+            <div class="gap-2 content-end flex-wrap">
                 <button type="button" id="searchLinks" class="btn btn-success">Buscar</button>
                 <button type="button" id="clearFilters" class="btn btn-info">Limpar</button>
             </div>
@@ -79,7 +79,7 @@ $searchQuery = request()->get('search', '');
                         @foreach ($links as $payment)
                             <tr class="p-5 m-10">
                                 <td>
-                                    <div class="flex justify-between">
+                                    <div class="flex justify-between items-center">
                                         <a href="{{ url('/pay') . '/' . $payment->id }}" target="_blank">
                                             {{ $payment->id }}</a>
                                         <button type="button" class="btn-copy btn btn-blue mr-3"
@@ -216,17 +216,22 @@ $searchQuery = request()->get('search', '');
 
                 let filterStatus = document.querySelector('#filter_status').value;
                 let filterSearch = document.querySelector('#filter_search').value;
-                // alert('TODO: make filter work');
-                // alert(filterSearch + ' ' + filterStatus);
 
                 let url = new URL(route);
                 if (filterSearch) {
                     url.searchParams.append('search', filterSearch);
+                } else {
+                    url.searchParams.delete('search');
                 }
+
                 if (filterStatus) {
                     url.searchParams.append('status', filterStatus);
+                } else {
+                    url.searchParams.delete('status');
                 }
-                window.location.href = url.toString();
+                if (filterSearch || filterStatus) {
+                    window.location.href = url.toString();
+                }
             })
         </script>
     @endsection
