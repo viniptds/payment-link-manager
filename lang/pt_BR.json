@@ -18,6 +18,13 @@
     "Customers": "Clientes",
     "Users": "Operadores",
 
-    "Welcome": "Bem-vindo (a)"
+    "Welcome": "Bem-vindo (a)",
+    
+    "payment.status.pending": "Pendente",
+    "payment.status.paid": "Pago",
+    "payment.status.expired": "Expirado",
+    "payment.status.active": "Ativo",
+    "payment.status.cancelled": "Cancelado"
+
 
 }

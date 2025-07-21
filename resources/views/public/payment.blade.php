@@ -89,15 +89,15 @@ $page = $_GET['page'] ?? 'home';
                     <input type="hidden" name="customer_id" id="personal-customerId" value="{{$customer->id ?? ''}}">
                     <div class="my-4">
                         <label for="payment-name" class="label-control">
-                            Nome completo</label>
+                            Nome completo *</label>
                         <input type="text" name="name" id="payment-name" placeholder="João da Silva" class="form-control" value="{{old('name') ?? $customer->name ?? ''}}">
                     </div>
                     <div class="my-4">
-                        <label class="label-control">Email</label>
+                        <label class="label-control">Email *</label>
                         <input class="form-control" type="email" name="email" id="payment-email" placeholder="exemplo@exemplo.com" value="{{old('email') ?? $customer->email ?? ''}}">
                     </div>
                     <div class="my-4">
-                        <label class="label-control">CPF</label>
+                        <label class="label-control">CPF *</label>
                         <input class="form-control cpf-mask" type="text" name="cpf" id="payment-cpf" placeholder="000.000.000-00" maxlength="14" value="{{old('cpf') ?? $customer->cpf ?? ''}}">
                     </div>
                     <div class="my-4">

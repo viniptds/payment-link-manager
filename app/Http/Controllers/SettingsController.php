@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Contracts\Cache\Factory;
 use App\Models\Settings;
+use Illuminate\Support\Facades\Cache;
 
 class SettingsController extends Controller
 {
@@ -33,8 +34,8 @@ class SettingsController extends Controller
 
         $setting->value = $request['value'];
         $setting->save();
-        $cache->forget('settings');
 
+        Cache::forget('app.settings');
         return response()->json([
             'status' => true,
             'id' => $setting->id,
@@ -59,7 +60,7 @@ class SettingsController extends Controller
             );
         }
 
-        $cache->forget('settings');
+        Cache::forget('app.settings');
 
         return redirect(route('settings.index'));
     }

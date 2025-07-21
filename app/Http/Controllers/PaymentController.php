@@ -23,6 +23,19 @@ class PaymentController extends Controller
         if (!$request->user()->is_admin) {
             $links = Payment::select()->where('created_by', $request->user()->id);
         }
+        
+        if (!empty($request->search)) {
+            $search = $request->search;
+            $links = $links->where(function ($query) use ($search) {
+                $query->where('description', 'like', '%' . $search . '%')
+                    ->orWhere('id', 'like', '%' . $search . '%');
+            });
+        }
+
+        if (!empty($request->status)) {
+            $status = $request->status;
+            $links = $links->where('status', $status);
+        }
 
         $links = $links->orderByDesc('created_at')->paginate(10);
 
@@ -58,7 +71,7 @@ class PaymentController extends Controller
         // $payment->status = Payment::STATUS_PENDING;
         $payment->status = Payment::STATUS_INACTIVE;
 
-        if ($data['gateway_ids']) {
+        if ($data['gateway_ids'] ?? []) {
             $payment->gateways()->sync($data['gateway_ids']);
         }
 
