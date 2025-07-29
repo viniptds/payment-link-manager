@@ -138,15 +138,16 @@ $searchQuery = request()->get('search', '');
                         </svg>
                     </button>
                 </div>
-                <form method="POST" action="payments">
+                <form method="POST" action="payments" id="sendCreateLinkForm">
                     <!--Modal body-->
                     <div class="relative flex-auto p-4" data-te-modal-body-ref>
                         @csrf
                         <div class="mb-2">
                             <label for="valueInput">Valor de Pagamento *</label>
-                            <input class='form-control' id='valueInput' name='value' type="number" step="0.01"
-                                min="0.01" {{-- min="{{env('CIELO_MIN_INSTALLMENT_VALUE', 50)}}"  --}} title="Valor mínimo de R$ 50,00"
-                                onkeyup="updateInstallments(this, 'maxInstallmentsSelect')" required>
+                            <input class='form-control money-mask' id='valueInput' name='value' type="text"
+                                value="0.00" {{-- step="0.01" 
+                                min="0.01" min="{{env('CIELO_MIN_INSTALLMENT_VALUE', 50)}}"  --}} title="Valor mínimo de R$ 50,00"
+                                onkeyup="calculateValue(this)" required>
                         </div>
                         <div class="mb-2">
                             <label>Descrição *</label>
@@ -157,10 +158,10 @@ $searchQuery = request()->get('search', '');
                             <label>Válido até</label>
                             <input class="form-control" name='expire_at' id='expireAtInput' type="datetime-local">
                         </div>
-                        {{-- <div class="mb-2">
-                <label>Número de Parcelas</label>
-                <select class="form-control" name='max_installments' id='maxInstallmentsSelect'></select>
-              </div> --}}
+                        <div class="mb-2">
+                            <label>Número de Parcelas</label>
+                            <select class="form-control" name='max_installments' id='maxInstallmentsSelect'></select>
+                        </div>
                     </div>
 
                     <!--Modal footer-->
@@ -169,7 +170,7 @@ $searchQuery = request()->get('search', '');
                         <button type="button"
                             class="inline-block rounded bg-primary-100 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-primary-700 transition duration-150 ease-in-out hover:bg-primary-accent-100 focus:bg-primary-accent-100 focus:outline-none focus:ring-0 active:bg-primary-accent-200"
                             data-te-modal-dismiss data-te-ripple-init data-te-ripple-color="light">
-                            Close
+                            Fechar
                         </button>
                         <button type="submit"
                             class="btn btn-blue ml-1 inline-block rounded bg-primary  font-medium leading-normal "
@@ -183,8 +184,27 @@ $searchQuery = request()->get('search', '');
     </div>
 
     @section('js')
-        <script src="{{ url('/cielo/installment-calculator-dynamic.js') }}"></script>
         <script>
+            // On ready, set the mask into the value input
+            document.addEventListener("DOMContentLoaded", function() {
+                // let valueInput = document.querySelector('#valueInput');
+                $(function() {
+                    $('.money-mask').maskMoney({
+                        prefix: 'R$ ',
+                        allowNegative: false,
+                        thousands: '.',
+                        decimal: ',',
+                        affixesStay: true,
+                        suffix: '',
+                        allowZero: true,
+                        allowEmpty: true,
+                        defaultZero: true,
+                        // showSymbol: true,
+                        // symbolStay: true,
+                        // symbol: 'R$ ',
+                    });
+                })
+            });
             const maxInstallments = parseInt("{{ env('CIELO_MAX_INSTALLMENTS', 12) }}");
             const installmentMinValue = parseFloat("{{ env('CIELO_MIN_INSTALLMENT_VALUE', 50) }}");
 
@@ -198,6 +218,7 @@ $searchQuery = request()->get('search', '');
                     target.classList.remove('btn-blue');
 
                     setTimeout(() => returnCopied(target), 3000);
+                    Message.success('Link copiado com sucesso!');
                 })
             });
 
@@ -233,6 +254,29 @@ $searchQuery = request()->get('search', '');
                     window.location.href = url.toString();
                 }
             })
+
+            // $('form').on('submit', function(e) {
+            $('#sendCreateLinkForm').submit(function(e) {
+                // Pega valor original formatado
+                const masked = $('#valueInput').val();
+
+                // Pega o valor desmascarado como array de números
+                const unmasked = $('#valueInput').maskMoney('unmasked')[0];
+
+                // Substitui no input antes de enviar
+                $('#valueInput').val(unmasked);
+            });
+            // });
+
+            function calculateValue(input) {
+                let value = $(input).maskMoney('unmasked')[0];
+                console.log(value);
+                // if (value < 50) {
+                //     value = 50;
+                // }
+                updateInstallments(parseFloat(value).toFixed(2), 'maxInstallmentsSelect', 1);
+            }
         </script>
+        <script src="{{ url('/cielo/installment-calculator-dynamic.js') }}"></script>
     @endsection
 </x-app-layout>

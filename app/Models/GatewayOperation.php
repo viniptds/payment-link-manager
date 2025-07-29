@@ -14,7 +14,7 @@ class GatewayOperation extends Model
     const VOID_OPERATION = 'void';
     const PAY_OPERATION = 'pay';
 
-    protected $fillable = ['id', 'log', 'payment_id', 'gateway', 'type'];
+    protected $fillable = ['id', 'log', 'payment_id', 'gateway_id', 'type'];
 
     public function payment(): BelongsTo
     {

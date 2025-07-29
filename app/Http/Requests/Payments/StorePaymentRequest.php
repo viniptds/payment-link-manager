@@ -26,9 +26,9 @@ class StorePaymentRequest extends FormRequest
             'value' => 'required|numeric|decimal:0,2|gt:0',
             'description' => 'required|string|min:1|max:100',
             'expire_at' => 'nullable|date|after_or_equal:now',
-            // 'max_installments' => 'nullable|numeric|gt:0|lte:' . env('CIELO_MAX_INSTALLMENTS', 12),
+            'max_installments' => 'nullable|numeric|gt:0|lte:' . env('CIELO_MAX_INSTALLMENTS', 12),
             'gateway_ids' => 'nullable|array',
-            'gateway_ids.*' => 'nullable|exists:gateways',
+            'gateway_ids.*' => 'nullable|exists:gateways,id',
             'customer_id' => 'nullable|exists:customers'
         ];
     }

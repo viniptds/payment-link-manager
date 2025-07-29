@@ -124,16 +124,16 @@ $page = $_GET['page'] ?? 'home';
                 <form action="{{ $payment->id . '/checkout'}}" method="post">
                     <input type="hidden" name="customer_id" id="cardInfo-customerId" value="{{$customer->id ?? ''}}">
                     <div class="my-4">
-                        <label class="label-control">Número do Cartão</label>
+                        <label class="label-control">Número do Cartão *</label>
                         <input class="form-control card-mask" type="text" name="card_number" id="cardInfo-cardNumber" maxlength='19' placeholder="0000 0000 0000 0000" value="{{old('card_number')}}">
                     </div>
 
                     <div class="my-4">
-                        <label class="label-control">CVV</label>
+                        <label class="label-control">CVV *</label>
                         <input class="form-control number-mask" type="text" maxlength='3' name="card_cvv" id="cardInfo-cvv" placeholder="000">
                     </div>
                     <div class="my-4">
-                        <label class="label-control" for="card_brand" class="">Bandeira</label>
+                        <label class="label-control" for="card_brand" class="">Bandeira *</label>
                         <select class="form-control" name="card_brand" id="cardInfo-card_brand" placeholder="Selecione a bandeira">
                             <option></option>
                         @foreach($card_brands as $brand)
@@ -144,7 +144,7 @@ $page = $_GET['page'] ?? 'home';
                         </select>
                     </div>
                     <div class="my-4">
-                        <label class="label-control"  for="installments">Parcelas</label>
+                        <label class="label-control"  for="installments">Parcelas *</label>
                         <select class="form-control" name="payment_installments" id="cardInfo-installments">
                         @for($i = 1; $i <= $payment->max_installments && ($i == 1 || (floor($payment->value / $i) >= floatval(env('CIELO_MIN_INSTALLMENT_VALUE')))); $i++)
                         <option value="{{$i}}" {{old('payment_installments') == $i ? 'selected' : ''}}>
@@ -155,12 +155,12 @@ $page = $_GET['page'] ?? 'home';
                     </div>
 
                     <div class="my-4">
-                        <label class="label-control" >Validade</label>
+                        <label class="label-control" >Validade *</label>
                         <input class="form-control" type="month" maxlength=3 name="card_expiration_date" id="cardInfo-expiration_date" value="{{old('card_expiration_date')}}">
                     </div>
 
                     <div class="mt-4 mb-10">
-                        <label class="label-control">Nome impresso no Cartão</label>
+                        <label class="label-control">Nome impresso no Cartão *</label>
 
                         <input class="form-control" type="text" name="card_holder" id="cardInfo-name" placeholder="João da Silva" value="{{old('card_holder')}}">
                     </div>

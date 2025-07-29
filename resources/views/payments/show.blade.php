@@ -56,12 +56,12 @@ $customer = $payment->customer ?? false;
                 <div class="flex">
                   @if ($payment->status == 'paid')
                   <div class="my-5 mr-3">
-                    <a class="btn btn-blue" href="{{url('/pay/' . $payment->id . '/receipt')}}" target="_blank"> Ver Recibo </a>
+                    <button class="btn btn-blue" onclick="viewReceipt()" target="_blank"> Ver Recibo </button>
                   </div>
                     @if ($hasPayment) 
                       @if(date('Y-m-d H:i:s', strtotime($payment->paid_at .  ' + 1 day')) <= date('Y-m-d H:i:s'))
                       <div class="my-5 mr-3">
-                        <a class="btn btn-red cursor-pointer" id="btnCancelPurchase" data-paymentid="{{$payment->id}}">Cancelar Compra</a>
+                        <button class="btn btn-red cursor-pointer" id="btnCancelPurchase" data-paymentid="{{$payment->id}}">Cancelar Compra</button>
                       </div>
                       @else
                       <div class="my-5 mr-3">
@@ -72,17 +72,20 @@ $customer = $payment->customer ?? false;
                   @endif
                   @if(Auth::user()->is_admin && in_array($payment->status, ['active', 'inactive']))
                   <div class="my-5 mr-3">
-                    <a href="{{url('/payments/' . $payment->id . '/toggle-active')}}" class="btn btn-{{$payment->status == 'active' ? 'info' : 'success'}}"> {{ $payment->status == 'active' ? 'Desativar' : 'Ativar'}} </a>
+                    <button onclick="toggleStatus()" class="btn btn-{{$payment->status == 'active' ? 'info' : 'success'}}"> {{ $payment->status == 'active' ? 'Desativar' : 'Ativar'}} </button>
                   </div>
                   @endif
                   @if ($payment->status == 'active')
                   <div class="my-5 mr-3">
-                    <a class="btn btn-blue" href="{{url('/payments/' . $payment->id . '/mark-as-paid')}}"> Marcar como Pago </a>
+                    <button class="btn btn-blue" onclick="confirmMarkAsPaid()">Marcar como Pago </button>
+                    {{-- <a class="btn btn-blue" href="{{url('/payments/' . $payment->id . '/mark-as-paid')}}"> Marcar como Pago </a> --}}
                   </div>
                   @endif
                   @if (empty($payment->gatewayOperations) || !in_array($payment->status, ['paid', 'cancelled']))
                   <div class="my-5">
-                    <a class="btn btn-red" href="{{url('/payments/' . $payment->id . '/delete')}}"> Remover </a>
+
+                    <button class="btn btn-red" onclick="confirmRemove()">Remover </button>
+                    {{-- <a class="btn btn-red" href="{{url('/payments/' . $payment->id . '/delete')}}"> Remover </a> --}}
                   </div>
                   @endif
                 </div>
@@ -152,24 +155,24 @@ $customer = $payment->customer ?? false;
                   <input class='form-control' name='description' id='descriptionInput' type="text" maxlength='100' value="{{$payment->description}}">
                   
                   <label>Válido até</label>
-                  <input class='form-control' name='expire_at' id='expireAtInput' type="datetime-local" value="{{date('Y-m-d H:i:s', strtotime($payment->expire_at))}}">
+                  <input class='form-control' name='expire_at' id='expireAtInput' type="datetime-local" value="{{ $payment->expire_at ? date('Y-m-d H:i:s', strtotime($payment->expire_at)) : null}}">
                   
                   <label>Número de Parcelas</label>
                   <select class="form-control" name='max_installments' id='maxInstallmentsSelect'></select>
-
+{{-- 
                   <label>Status</label>
                   <select class="form-control" name="status">
                     <option value='active' {{in_array($payment->status, ['active', 'expired']) ? 'selected' : ''}}>{{__('payments.status.active')}}</option>
                     <option value='inactive' {{$payment->status == 'inactive' ? 'selected' : ''}}>{{__('payments.status.inactive')}}</option>
-                  </select>
+                  </select> --}}
 
-                  <label>Atribuir cliente</label>
+                  {{-- <label>Atribuir cliente</label>
                   <select class="form-control" name="customer_id">
                     <option value="">Selecione</option>
                     @foreach ($customers as $customer)
                     <option value='{{$customer->id}}' {{$payment->customer_id == $customer->id ? 'selected' : ''}}>{{$customer->name}}</option>
                     @endforeach
-                  </select>
+                  </select> --}}
 
                   {{-- <input type="text" id="searchableGateway" class="form-control"> --}}
                   <label>Atribuir gateway(s)</label>
@@ -211,6 +214,28 @@ $customer = $payment->customer ?? false;
     updateInstallments(input, 'maxInstallmentsSelect',  selectedValue);
   });
 
+  function confirmMarkAsPaid() {
+    if (confirm('Tem certeza que deseja marcar este pagamento como pago?')) {
+      window.location.href = "{{url('/payments/' . $payment->id . '/mark-as-paid')}}";
+    }
+  }
+
+  function confirmRemove() {
+    if (confirm('Tem certeza que deseja remover este link de pagamento?')) {
+      window.location.href = "{{url('/payments/' . $payment->id . '/delete')}}";
+    }
+  }
+  
+  function toggleStatus() {
+    // if (confirm('Tem certeza que deseja alterar o status deste link de pagamento?')) {
+      window.location.href = "{{url('/payments/' . $payment->id . '/toggle-active')}}";
+    // }
+  }
+
+  function viewReceipt() {
+    window.open("{{url('/pay/' . $payment->id . '/receipt')}}", '_blank');
+  }
+  
   @if ($hasPayment)
   function voidTransaction(element) {
     let paymentId = element.dataset.paymentid;

@@ -92,7 +92,7 @@ class PublicPaymentController extends Controller
             $sale = $cieloHelper->makeCreditCardPayment($card);
             
             $gatewayOperation = new GatewayOperation();
-            $gatewayOperation->gateway = 'CIELO30';
+            $gatewayOperation->gateway_id = 1; // Assuming 1 is the ID for Cielo gateway
             $gatewayOperation->type = GatewayOperation::PAY_OPERATION;
             $gatewayOperation->status = false;
             

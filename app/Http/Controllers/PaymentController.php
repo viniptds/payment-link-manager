@@ -65,21 +65,25 @@ class PaymentController extends Controller
         $payment->id = Str::uuid();
         $payment->value = $data['value'];
         $payment->description = $data['description'];
-        $payment->max_installments = $data['max_installments'] ?? null;
+        $payment->max_installments = $data['max_installments'] ?? 1;
         $payment->expire_at = $data['expire_at'] ?? null;
         $payment->created_by = $request->user()->id;
-        // $payment->status = Payment::STATUS_PENDING;
-        $payment->status = Payment::STATUS_INACTIVE;
+
+        $payment->status = Payment::STATUS_ACTIVE;
+
+        if ($payment->expire_at && $payment->expire_at <= date('Y-m-d H:i:s')) {
+            $payment->status = Payment::STATUS_EXPIRED;
+        }
+
+        $payment->save();
+
+        if (empty($data['gateway_ids'])) {
+            $data['gateway_ids'] = [1];
+        }
 
         if ($data['gateway_ids'] ?? []) {
             $payment->gateways()->sync($data['gateway_ids']);
         }
-
-        // if ($payment->expire_at && $payment->expire_at <= date('Y-m-d H:i:s')) {
-        //     $payment->status = Payment::STATUS_EXPIRED;
-        // }
-
-        $payment->save();
 
         return redirect('payments/' . $payment->id);
     }
@@ -106,6 +110,7 @@ class PaymentController extends Controller
     {
         $message = 'O pagamento já foi pago e não pode ser removido';
         if ($payment->status != Payment::STATUS_PAID) {
+            $payment->gateways()->detach();
             $payment->delete();
             $message = 'O pagamento foi removido com sucesso';
         }
