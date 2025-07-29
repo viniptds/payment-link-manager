@@ -48,7 +48,7 @@
 
             <!-- Hero Section -->
             <section class="min-h-screen flex flex-col items-center justify-center text-center px-4">
-              <img src="{{url(config('settings.logo_main', 'logo.png'))}}" alt="Charging Manager Logo" class="w-64 h-64 mb-6" />
+              <img src="{{asset('storage/assets/' . config('settings.logo_main', 'logo.png'))}}" alt="Charging Manager Logo" class="w-64 h-64 mb-6" />
               <h1 class="text-4xl font-bold mb-2">Charging Manager</h1>
               <p class="text-lg mb-6 max-w-xl">
                 Manage, monitor and optimize your charging stations with ease. Reliable, fast, and secure.

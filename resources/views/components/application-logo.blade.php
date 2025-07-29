@@ -1,1 +1,1 @@
-<img src="{{url(config('settings.logo_main', ''))}}" class="{{$class}}" />
+<img src="{{ asset('storage/assets/' . config('settings.logo_main', '')) }}" class="{{ $class }}" />
