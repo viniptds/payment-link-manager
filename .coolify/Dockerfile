@@ -41,7 +41,7 @@ RUN npm install
 RUN npm run build
 
 RUN php artisan optimize:clear && php artisan config:clear && php artisan route:clear && php artisan view:clear && php artisan optimize \ 
-&& chown -R unit:unit /var/www/html/storage /var/www/html/bootstrap/cache
+&& chown -R unit:unit /var/www/html/storage /var/www/html/bootstrap/cache && php artisan storage:link
 
 COPY unit.json /docker-entrypoint.d/unit.json
 
