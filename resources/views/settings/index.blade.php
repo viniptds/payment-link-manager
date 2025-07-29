@@ -15,18 +15,44 @@
                     </thead>
                     <tbody>
                         @foreach ($settings as $setting)
-                        <tr class="p-5 mb-4">
-                            <td title="{{$setting->description}}">{{ $setting->id }}</td>
-                            <td id="label_{{$setting->id}}">{{ $setting->value }} </td>
-                            <td>{{ $setting->type ?? 'Any' }} </td>
-                            <td> <input type="text" class="" id="value_{{$setting->id}}" value="{{$setting->value}}"> </td>
-                            
-                            <td>{{ date('d/m/Y H:i:s', strtotime($setting->updated_at)) }} - {{$setting->user->email}}</td>
+                            <tr class="p-10 mb-4 border-b border-gray-200 hover:bg-gray-100">
+                                <td title="{{ $setting->description }}">{{ $setting->id }}</td>
+                                <td id="label_{{ $setting->id }}">
+                                    @if ($setting->type == 'file')
+                                        <img src="{{ $setting->value }}" class="w-10 h-10">
+                                    @else
+                                        {{ $setting->value }}
+                                    @endif
+                                </td>
+                                <td>{{ __('settings.type.' . ($setting->type ?? 'any')) }} </td>
+                                <td>
+                                    @switch ($setting->type)
+                                        @case('boolean')
+                                            <select class="form-select" id="value_{{ $setting->id }}">
+                                                <option value="1" {{ $setting->value ? 'selected' : '' }}>Sim</option>
+                                                <option value="0" {{ !$setting->value ? 'selected' : '' }}>Não</option>
+                                            </select>
+                                        @break
 
-                            <td>
-                                <button type='button' class="btn btn-info btn-save-setting" data-id='{{$setting->id}}'>Salvar</a>
-                            </td>
-                        </tr>
+                                        @case('file')
+                                            <input type="file" class="" id="value_{{ $setting->id }}"
+                                                value="{{ $setting->value }}">
+                                        @break
+
+                                        @default
+                                            <input type="text" class="" id="value_{{ $setting->id }}"
+                                                value="{{ $setting->value }}">
+                                    @endswitch
+                                </td>
+
+                                <td>{{ date('d/m/Y H:i:s', strtotime($setting->updated_at)) }} -
+                                    {{ $setting->user->email }}</td>
+
+                                <td>
+                                    <button type='button' class="btn btn-info btn-save-setting"
+                                        data-id='{{ $setting->id }}'>Salvar</a>
+                                </td>
+                            </tr>
                         @endforeach
                     </tbody>
                 </table>
@@ -49,29 +75,45 @@
                 return;
             }
 
+            let formData = new FormData();
+
+            let fileInput = document.querySelector('#value_' + target);
+            if (fileInput && fileInput.files && fileInput.files.length > 0) {
+                formData.append('file', fileInput.files[0]);
+            }
+
             let value = document.querySelector('#value_' + target).value;
-            let data = {
-                id: target,
-                value: value,
-            };
+            if (value) {
+                formData.append('value', value);
+            }
 
             fetch(`/settings/${target}`, {
-                method: "POST",
-                body: JSON.stringify(data),
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            })
-            .then(json => {
-                return json.json();
-            })
-            .then(data => {
-                console.log(data)
-                if (data.status) {
-                    document.querySelector('#label_' + data.id).innerHTML = data.value; 
-                    alert('Configuração salva com sucesso!');
-                }
-            })
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        // "Content-Type": "application/json",
+                    },
+                })
+                .then(json => {
+                    return json.json();
+                })
+                .then(data => {
+                    console.log(data)
+                    if (data.status) {
+                        Message.success('Configuração salva com sucesso!');
+
+                        setTimeout(() => {
+                            window.location.reload();
+
+                        }, timeout = 2000);
+
+                        // document.querySelector('#label_' + data.id).innerHTML = data.value;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Message.error('Erro ao salvar configuração: ' + error.message);
+                });
         })
     })
 </script>

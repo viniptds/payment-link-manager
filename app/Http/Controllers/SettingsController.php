@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\UpdateSettingsRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Contracts\Cache\Factory;
 use App\Models\Settings;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class SettingsController extends Controller
 {
@@ -16,26 +18,37 @@ class SettingsController extends Controller
         return view('settings.index')->with('settings', $settings);
     }
 
-    public function update(Settings $setting, Request $request, Factory $cache)
+    public function update(Settings $setting, UpdateSettingsRequest $request)
     {
-        $request->validate([
-            'file' => 'nullable|file',
-            'value' => 'required|string|min:1|max:100',
-        ]);
+        Log::info('Updating setting: ' . $setting->id);
+        $request->validated();
         
         $data = $request->post();
 
-        if ($setting->type == 'file') {
-            if (empty($data['file'])) {
-                // File was not sent
+        if ($setting->type == Settings::TYPE_FILE) {
+            if (!empty($request->file('file') ?? null)) {
+                $originalName = $request->file('file')->getClientOriginalName();
+                $request->file('file')->storeAs(
+                    'assets',
+                    $originalName,
+                    'public'
+                );
+
+                if (Storage::disk('public')->exists('assets/' . $setting->value)) {
+                    Storage::disk('public')->delete('assets/' . $setting->value);
+                }
+
+                $setting->value = $originalName;
             }
-            // TODO: Process file handling
+            // File was not sent
+        } else {
+            $setting->value = $data['value'];
         }
 
-        $setting->value = $request['value'];
         $setting->save();
 
         Cache::forget('app.settings');
+
         return response()->json([
             'status' => true,
             'id' => $setting->id,
@@ -44,7 +57,7 @@ class SettingsController extends Controller
 
     }
 
-    public function restoreFromFactory(Factory $cache) 
+    public function restoreFromFactory() 
     {
         $factoryValues = Settings::getFactoryValues();
 

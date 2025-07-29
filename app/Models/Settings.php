@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 
 class Settings extends Model
 {
@@ -12,12 +13,12 @@ class Settings extends Model
 
     const TYPE_TEXT = 'text';
     const TYPE_FILE = 'file';
-    const TYPE_CUSTOM = 'custom';
+    const TYPE_BOOLEAN = 'bool';
 
     const DATA_TYPES = [
         self::TYPE_TEXT,
         self::TYPE_FILE,
-        self::TYPE_CUSTOM,
+        self::TYPE_BOOLEAN,
     ];
 
     const APP_NAME = 'app_name';
@@ -26,6 +27,14 @@ class Settings extends Model
 
     public $incrementing = false;
     protected $fillable = ['id', 'value', 'type', 'description', 'created_at', 'updated_at', 'updated_by'];
+
+    public function getValueAttribute($value)
+    {
+        if ($this->type == self::TYPE_FILE) {
+            return Storage::disk('public')->url('assets/' . $value);
+        }
+        return $value;
+    }
 
     public function user(): BelongsTo
     {
@@ -37,19 +46,23 @@ class Settings extends Model
         return [
             self::APP_NAME => [
                 'value' => 'MyCompanyName',
-                'type' => 'text',
+                'type' => Settings::TYPE_TEXT,
                 'description' => ''
             ],
             self::DEFAULT_LANGUAGE => [
                 'value' => 'pt-BR',
-                'type' => 'text',
+                'type' => Settings::TYPE_TEXT,
                 'description' => ''
             ],
             self::LOGO_MAIN => [
                 'value' => 'logo.png',
-                'type' => 'file',
+                'type' => Settings::TYPE_FILE,
                 'description' => ''
             ]
         ];
+
+        $logo = url('logo.png');
+
+        Storage::disk('local')->put('assets/logo.png', file_get_contents($logo));
     }
 }
