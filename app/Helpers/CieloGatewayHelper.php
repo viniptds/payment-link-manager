@@ -58,7 +58,7 @@ class CieloGatewayHelper {
 
     public function makeCreditCardPayment($creditCard)
     {
-        $softDescriptor = 'OABCEARA';
+        $softDescriptor = env('CIELO_SOFT_DESCRIPTOR', 'WAYGEXSOLUTIONS');
 
         $this->sale->getPayment()->setType(Payment::PAYMENTTYPE_CREDITCARD)
         ->setCapture(true)
