@@ -14,14 +14,30 @@
     "Customers": "Clientes",
     "Users": "Operadores",
     "Welcome": "Bem-vindo (a)",
+
+    "app.name": "Link de Pagamento",
+    "app.description": "Gerencie seus pagamentos de forma simples e rápida.",
+
+    "home.cta_1": "Comece agora",
+    "home.section_1_header": "Por que escolher o Link de Pagamentos?",
+    "home.section_1_option_1_header": "Pagamentos em tempo real",
+    "home.section_1_option_1_text": "Crie links de pagamento que permitem que seus clientes paguem de forma rápida e segura.",
+    "home.section_1_option_2_header": "Gerenciamento de Clientes",
+    "home.section_1_option_2_text": "Mantenha um registro dos seus clientes e suas transações.",
+    "home.section_1_option_3_header": "Ambiente Seguro",
+    "home.section_1_option_3_text": "Todos os dados são criptografados e protegidos.",
+    "home.cta_section_1_title": "Crie seu primeiro link de pagamento",
+    "home.cta_section_1_button": "Começar agora",
+
     "payment.status.pending": "Pendente",
     "payment.status.paid": "Pago",
     "payment.status.expired": "Expirado",
     "payment.status.active": "Ativo",
     "payment.status.cancelled": "Cancelado",
-    
+
     "settings.type.text": "Texto",
     "settings.type.file": "Arquivo",
     "settings.type.bool": "Booleano",
-    "settings.type.any": "Qualquer"
+    "settings.type.any": "Qualquer",
+    "config.copyright": "Todos os direitos reservados."
 }

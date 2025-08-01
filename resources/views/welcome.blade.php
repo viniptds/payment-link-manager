@@ -49,31 +49,31 @@
             <!-- Hero Section -->
             <section class="min-h-screen flex flex-col items-center justify-center text-center px-4">
               <img src="{{asset('storage/assets/' . config('settings.logo_main', 'logo.png'))}}" alt="Charging Manager Logo" class="w-64 h-64 mb-6" />
-              <h1 class="text-4xl font-bold mb-2">Charging Manager</h1>
+              <h1 class="text-4xl font-bold mb-2">{{__('app.name')}}</h1>
               <p class="text-lg mb-6 max-w-xl">
-                Manage, monitor and optimize your charging stations with ease. Reliable, fast, and secure.
+                {{__("app.description")}}
               </p>
-              <a href="#get-started" class="bg-blue-600 text-white px-6 py-3 rounded-full hover:bg-blue-700 transition">
-                Get Started
+              <a href="login" class="bg-blue-600 text-white px-6 py-3 rounded-full hover:bg-blue-700 transition">
+                {{__('home.cta_1')}}
               </a>
             </section>
           
             <!-- Features Section -->
             <section class="bg-white py-20 px-6">
               <div class="max-w-5xl mx-auto text-center">
-                <h2 class="text-3xl font-semibold mb-8">Why Choose Charging Manager?</h2>
+                <h2 class="text-3xl font-semibold mb-8">{{__('home.section_1_header')}}</h2>
                 <div class="grid md:grid-cols-3 gap-10">
                   <div>
-                    <h3 class="text-xl font-bold">Real-Time Monitoring</h3>
-                    <p class="text-sm mt-2 text-gray-600">Track station status, power usage, and faults live.</p>
+                    <h3 class="text-xl font-bold">{{__('home.section_1_option_1_header')}}</h3>
+                    <p class="text-sm mt-2 text-gray-600">{{__('home.section_1_option_1_text')}}</p>
                   </div>
                   <div>
-                    <h3 class="text-xl font-bold">Smart Scheduling</h3>
-                    <p class="text-sm mt-2 text-gray-600">Optimize energy consumption and reduce costs.</p>
+                    <h3 class="text-xl font-bold">{{__('home.section_1_option_2_header')}}</h3>
+                    <p class="text-sm mt-2 text-gray-600">{{__('home.section_1_option_2_text')}}</p>
                   </div>
                   <div>
-                    <h3 class="text-xl font-bold">Secure Access</h3>
-                    <p class="text-sm mt-2 text-gray-600">Role-based controls and encrypted access for safety.</p>
+                    <h3 class="text-xl font-bold">{{__('home.section_1_option_3_header')}}</h3>
+                    <p class="text-sm mt-2 text-gray-600">{{__('home.section_1_option_3_text')}}</p>
                   </div>
                 </div>
               </div>
@@ -82,16 +82,16 @@
             <!-- Contact Section -->
             <section id="get-started" class="bg-gray-100 py-16 px-6">
               <div class="max-w-xl mx-auto text-center">
-                <h2 class="text-2xl font-bold mb-4">Ready to manage your charging stations?</h2>
+                <h2 class="text-2xl font-bold mb-4">{{__('home.cta_section_1_title')}}</h2>
                 {{-- <p class="text-sm text-gray-600 mb-6">Contact us at <a href="mailto:contact@waygex.com" class="text-blue-600 underline">contact@waygex.com</a></p> --}}
                 <a href="mailto:contact@waygex.com" class="bg-green-600 text-white px-6 py-3 mt-6 rounded-full hover:bg-green-700 transition">
-                  Contact Us
+                  {{__('home.cta_section_1_button')}}
                 </a>
               </div>
             </section>
           
             <footer class="text-center text-sm text-gray-500 py-6">
-              &copy; 2025 Charging Manager by {{env('APP_NAME')}}. All rights reserved.
+              &copy; 2025 {{__('app.name')}} - {{env('APP_NAME')}}. {{__('config.copyright')}}
             </footer>
     </body>
 </html>

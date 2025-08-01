@@ -18,6 +18,32 @@
     "Customers": "Clientes",
     "Users": "Operadores",
 
-    "Welcome": "Bem-vindo (a)"
+    "Welcome": "Bem-vindo (a)",
+
+    "app.name": "Payment Link",
+    "app.description": "Manage, monitor and optimize your charging stations with ease. Reliable, fast, and secure.",
+
+    "home.cta_1": "Get Started",
+    "home.section_1_header": "Why Choose Charging Manager?",
+    "home.section_1_option_1_header": "Real-Time Monitoring",
+    "home.section_1_option_1_text": "Track station status, power usage, and faults live.",
+    "home.section_1_option_2_header": "Smart Scheduling",
+    "home.section_1_option_2_text": "Optimize energy consumption and reduce costs.",
+    "home.section_1_option_3_header": "Secure Access",
+    "home.section_1_option_3_text": "Role-based controls and encrypted access for safety.",
+    "home.cta_section_1_title": "Ready to manage your charging stations?",
+    "home.cta_section_1_button": "Contact Us",
+
+    "payment.status.pending": "Pendente",
+    "payment.status.paid": "Pago",
+    "payment.status.expired": "Expirado",
+    "payment.status.active": "Ativo",
+    "payment.status.cancelled": "Cancelado",
+
+    "settings.type.text": "Texto",
+    "settings.type.file": "Arquivo",
+    "settings.type.bool": "Booleano",
+    "settings.type.any": "Qualquer",
+    "config.copyright": "All rights reserved."
 
 }
