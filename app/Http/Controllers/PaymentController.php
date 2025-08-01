@@ -23,7 +23,7 @@ class PaymentController extends Controller
         if (!$request->user()->is_admin) {
             $links = Payment::select()->where('created_by', $request->user()->id);
         }
-        
+
         if (!empty($request->search)) {
             $search = $request->search;
             $links = $links->where(function ($query) use ($search) {
@@ -34,7 +34,16 @@ class PaymentController extends Controller
 
         if (!empty($request->status)) {
             $status = $request->status;
-            $links = $links->where('status', $status);
+            if ($request->status == Payment::STATUS_EXPIRED) {
+                $links = $links->whereIn('status', [$status, Payment::STATUS_ACTIVE]);
+                $links = $links->where('expire_at', '<=', date('Y-m-d H:i:s'));
+            } else {
+                if ($request->status == Payment::STATUS_ACTIVE) {
+                    $links = $links->where('expire_at', '>', date('Y-m-d H:i:s'));
+                    $links = $links->orWhere('expire_at', null);
+                }
+                $links = $links->where('status', $status);
+            }
         }
 
         $links = $links->orderByDesc('created_at')->paginate(10);
