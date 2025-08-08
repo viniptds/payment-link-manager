@@ -24,6 +24,7 @@ class Settings extends Model
     const APP_NAME = 'app_name';
     const LOGO_MAIN = 'logo_main';
     const DEFAULT_LANGUAGE = 'default_language';
+    const GTM_TAG = 'gtm_tag';
 
     public $incrementing = false;
     protected $fillable = ['id', 'value', 'type', 'description', 'created_at', 'updated_at', 'updated_by'];
@@ -57,6 +58,11 @@ class Settings extends Model
             self::LOGO_MAIN => [
                 'value' => 'logo.png',
                 'type' => Settings::TYPE_FILE,
+                'description' => ''
+            ],
+            self::GTM_TAG => [
+                'value' => '',
+                'type' => Settings::TYPE_TEXT,
                 'description' => ''
             ]
         ];
