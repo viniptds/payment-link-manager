@@ -7,6 +7,7 @@ use App\Models\Payment;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
@@ -17,20 +18,39 @@ class DashboardController extends Controller
      */
     public function index(Request $request): View
     {
-        $payments = Payment::select()->count();
-        $paid = Payment::select()->where('status', Payment::STATUS_PAID)->count();
-        $expired = Payment::select()->where('status', Payment::STATUS_EXPIRED)->count();
-        $canceled = Payment::select()->where('status', Payment::STATUS_CANCELLED)->count();
-        $active = Payment::select()->where('status', Payment::STATUS_ACTIVE)->count();
-        $inactive = Payment::select()->where('status', Payment::STATUS_INACTIVE)->count();
+        $payments = Payment::select(DB::raw('count(*) as count, sum(value) as sum'))->first();
+
+        $paid = Payment::select(DB::raw('count(*) as count, sum(value) as sum'))->where('status', Payment::STATUS_PAID)->first();
+        $expired = Payment::select(DB::raw('count(*) as count, sum(value) as sum'))->where('status', Payment::STATUS_EXPIRED)->first();
+        $canceled = Payment::select(DB::raw('count(*) as count, sum(value) as sum'))->where('status', Payment::STATUS_CANCELLED)->first();
+        $active = Payment::select(DB::raw('count(*) as count, sum(value) as sum'))->where('status', Payment::STATUS_ACTIVE)->first();
+        $inactive = Payment::select(DB::raw('count(*) as count, sum(value) as sum'))->where('status', Payment::STATUS_INACTIVE)->first();
+
 
         $data = [
-            'payments' => $payments,
-            'paid' => $paid,
-            'expired' => $expired,
-            'canceled' => $canceled,
-            'active' => $active,
-            'inactive' => $inactive,
+            'numbers' => [
+                'payments' => $payments->count,
+                'paid' => $paid->count,
+                'expired' => $expired->count,
+                'canceled' => $canceled->count,
+                'active' => $active->count,
+                'inactive' => $inactive->count,
+            ],
+            'payments' => $payments->sum,
+            'values' => [
+                'paid' => $paid->sum,
+                'expired' => $expired->sum,
+                'canceled' => $canceled->sum,
+                'active' => $active->sum,
+                'inactive' => $inactive->sum,
+            ],
+            'labels' => [
+                'Pagos',
+                'Expirados',
+                'Cancelados',
+                'Ativos',
+                'Inativos',
+            ]
         ];
         return view('dashboard')->with('data', $data);
     }

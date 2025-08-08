@@ -8,38 +8,85 @@
     <!-- <div class="py-5">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="pb-5">
-                <h1 class="text-lg font-bold ">{{__("Welcome")}}</h1>
+                <h1 class="text-lg font-bold ">{{ __('Welcome') }}</h1>
             </div>
             Acesse a aba de Links para mais informações
         </div>
     </div> -->
 
     <div class="py-5">
-        <div class="max-w-12lg mx-auto px-2 lg:px-8 sm:px-6 gap-4 grid sm:grid-cols-2 lg:grid-cols-6 grid-cols-1 lg:px-3 flex flex-wrap">
-            <div class="bg-white grow flex-1  shadow-sm sm:rounded-lg p-5">
-                <p class="font-bold" >Total de Links</p>
-                <p>{{$data['payments']}}</p>
+        <div
+            class="max-w-12lg mx-auto px-2 lg:px-8 sm:px-6 gap-4 grid sm:grid-cols-2 lg:grid-cols-6 grid-cols-1 lg:px-3 flex flex-wrap">
+            <div class="bg-white flex-1  shadow-sm sm:rounded-lg p-5">
+                <p class="font-bold">Total de Links</p>
+                <p>{{ $data['numbers']['payments'] }}</p>
             </div>
-            <div class="bg-white grow flex-1  shadow-sm sm:rounded-lg p-5">
+            <div class="bg-white flex-1  shadow-sm sm:rounded-lg p-5">
                 <p class="font-bold">Ativos</p>
-                <p>{{$data['active']}}</p>
+                <p>{{ $data['numbers']['active'] }}</p>
             </div>
-            <div class="bg-white grow flex-1  shadow-sm sm:rounded-lg p-5">
+            <div class="bg-white flex-1  shadow-sm sm:rounded-lg p-5">
                 <p class="font-bold">Inativos</p>
-                <p>{{$data['inactive']}}</p>
+                <p>{{ $data['numbers']['inactive'] }}</p>
             </div>
-            <div class="bg-white grow flex-1  shadow-sm sm:rounded-lg p-5">
+            <div class="bg-white flex-1  shadow-sm sm:rounded-lg p-5">
                 <p class="font-bold">Pagos</p>
-                <p>{{$data['paid']}}</p>
+                <p>{{ $data['numbers']['paid'] }}</p>
             </div>
-            <div class="bg-white grow flex-1  shadow-sm sm:rounded-lg p-5">
+            <div class="bg-white flex-1  shadow-sm sm:rounded-lg p-5">
                 <p class="font-bold">Estornados</p>
-                <p>{{$data['canceled']}}</p>
+                <p>{{ $data['numbers']['canceled'] }}</p>
             </div>
-            <div class="bg-white grow flex-1  shadow-sm sm:rounded-lg p-5">
+            <div class="bg-white flex-1  shadow-sm sm:rounded-lg p-5">
                 <p class="font-bold">Expirados</p>
-                <p>{{$data['expired']}}</p>
+                <p>{{ $data['numbers']['expired'] }}</p>
             </div>
         </div>
     </div>
+
+    @if (Auth::user()->is_admin)
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+        <div class="py-5 px-2 sm:px-6 gap-4
+        flex 
+        ">
+            <div class="w-1/2-sm w-1/3 bg-white  shadow-sm sm:rounded-lg p-5">
+                <p class="font-bold">Total de Pagamentos</p>
+                <p>R$ {{ $data['payments'] }}</p>
+
+                <canvas id="payment-chart"></canvas>
+            </div>
+        </div>
+        <script type="text/javascript">
+            const ctx = document.getElementById('payment-chart');
+            const labels = @json($data['labels']);
+            const values = @json($data['values']);
+            console.log(labels, values);
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Pagamentos',
+                        data: Object.values(values),
+                        borderWidth: 1,
+                        backgroundColor: [
+                            'rgb(75, 192, 192)',
+                            'rgb(255, 99, 132)',
+                            'rgb(255, 206, 86)',
+                            'rgb(54, 162, 235)',
+                            'rgb(201, 203, 207)'
+                        ]
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        </script>
+    @endif
 </x-app-layout>
