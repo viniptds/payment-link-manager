@@ -48,9 +48,8 @@
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
         <div class="py-5 px-2 sm:px-6 gap-4
-        flex 
-        ">
-            <div class="w-full lg:w-1/3 bg-white  shadow-sm sm:rounded-lg p-5">
+        flex grid lg:grid-cols-3">
+            <div class=" bg-white shadow-sm sm:rounded-lg p-5 w-auto">
                 <p class="font-bold">Total de Pagamentos</p>
                 <p>R$ {{ $data['payments'] }}</p>
 
