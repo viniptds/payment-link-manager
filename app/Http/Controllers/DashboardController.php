@@ -21,9 +21,9 @@ class DashboardController extends Controller
         $payments = Payment::select(DB::raw('count(*) as count, sum(value) as sum'))->first();
 
         $paid = Payment::select(DB::raw('count(*) as count, sum(value) as sum'))->where('status', Payment::STATUS_PAID)->first();
-        $expired = Payment::select(DB::raw('count(*) as count, sum(value) as sum'))->where('status', Payment::STATUS_EXPIRED)->first();
+        $expired = Payment::select(DB::raw('count(*) as count, sum(value) as sum'))->whereIn('status', [Payment::STATUS_EXPIRED, Payment::STATUS_ACTIVE])->where('expire_at', '<=', date('Y-m-d H:i:s'))->first();
         $canceled = Payment::select(DB::raw('count(*) as count, sum(value) as sum'))->where('status', Payment::STATUS_CANCELLED)->first();
-        $active = Payment::select(DB::raw('count(*) as count, sum(value) as sum'))->where('status', Payment::STATUS_ACTIVE)->first();
+        $active = Payment::select(DB::raw('count(*) as count, sum(value) as sum'))->where('status', Payment::STATUS_ACTIVE)->where('expire_at', '>', date('Y-m-d H:i:s'))->first();
         $inactive = Payment::select(DB::raw('count(*) as count, sum(value) as sum'))->where('status', Payment::STATUS_INACTIVE)->first();
 
 
