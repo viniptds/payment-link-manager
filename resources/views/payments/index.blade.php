@@ -72,7 +72,7 @@ $searchQuery = request()->get('search', '');
                         <th class="">Valor</th>
                         <th class="">Status</th>
                         <th class="">Criado Em</th>
-                        <th>Exipira Em</th>
+                        <th>Expira Em</th>
                         <th>Ações</th>
                     </thead>
                     <tbody>

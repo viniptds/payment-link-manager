@@ -103,7 +103,10 @@ class PaymentController extends Controller
         $message = 'O pagamento já foi efetuado. Não é possível editar os dados.';
 
         if ($payment->status != Payment::STATUS_PAID) {
-            $payment->fill($data);
+            $payment->value = $data['value'];
+            $payment->description = $data['description'];
+            $payment->expire_at = $data['expire_at'] ?? null;
+            $payment->max_installments = $data['max_installments'] ?? 1;
 
             if (!empty($data['gateway_ids'])) {
                 $payment->gateways()->sync($data['gateway_ids']);
