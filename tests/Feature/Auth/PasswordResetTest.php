@@ -12,11 +12,12 @@ class PasswordResetTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_reset_password_link_screen_can_be_rendered(): void
+    public function test_reset_password_link_screen_redirects_to_the_login(): void
     {
+        // requesting the link from a screen of its own is disabled in this app
         $response = $this->get('/forgot-password');
 
-        $response->assertStatus(200);
+        $response->assertRedirect('/login');
     }
 
     public function test_reset_password_link_can_be_requested(): void

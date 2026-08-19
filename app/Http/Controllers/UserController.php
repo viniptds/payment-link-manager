@@ -12,10 +12,11 @@ class UserController extends Controller
 {
     function index(Request $request) 
     {
-        $users = [];
-        if ($request->user()->is_admin) {
-            $users = User::visibleTo($request->user())->orderByDesc('created_at')->paginate(15);
+        if (!$request->user()->is_admin) {
+            abort(403);
         }
+
+        $users = User::visibleTo($request->user())->orderByDesc('created_at')->paginate(15);
 
         return view('users.index', [
             'users' => $users,
