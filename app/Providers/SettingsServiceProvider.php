@@ -32,6 +32,10 @@ class SettingsServiceProvider extends ServiceProvider
                 return DB::table('settings')->pluck('value', 'id')->toArray();
             });
 
+            // Resolved outside of the cache, the url depends on the host being
+            // served. Companies override it through the ResolveCompany middleware.
+            $settings['logo_url'] = asset('storage/assets/' . ($settings['logo_main'] ?? ''));
+
             config()->set('settings', $settings);
         } catch (\Throwable $e) {
             // You can log this in development

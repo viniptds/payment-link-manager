@@ -13,6 +13,9 @@
     "payment_links_header": "Links de Pagamento",
     "Customers": "Clientes",
     "Users": "Operadores",
+    "Companies": "Empresas",
+    "Active": "Ativo",
+    "Inactive": "Inativo",
     "Welcome": "Bem-vindo (a)",
 
     "app.name": "Link de Pagamento",

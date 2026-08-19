@@ -26,7 +26,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>{{ config('settings.app_name') }}</title>
+    <title>{{ config('settings.app_name', 'App') }}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -81,9 +81,9 @@
 
     <!-- Hero Section -->
     <section class="min-h-screen flex flex-col items-center justify-center text-center px-4">
-        <img src="{{ asset('storage/assets/' . config('settings.logo_main', 'logo.png')) }}" alt="Charging Manager Logo"
+        <img src="{{ config('settings.logo_url') }}" alt="{{ config('settings.app_name') }}"
             class="w-64 mb-6" />
-        <h1 class="text-4xl font-bold mb-2">Charging Manager</h1>
+        <h1 class="text-4xl font-bold mb-2">{{ config('settings.app_name') }}</h1>
         <p class="text-lg mb-6 max-w-xl">
             Manage, monitor and optimize your charging stations with ease. Reliable, fast, and secure.
         </p>

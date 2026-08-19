@@ -159,8 +159,33 @@ $searchQuery = request()->get('search', '');
                             <input class="form-control" name='expire_at' id='expireAtInput' type="datetime-local">
                         </div>
                         <div class="mb-2">
-                            <label>Número de Parcelas</label>
-                            <select class="form-control" name='max_installments' id='maxInstallmentsSelect'></select>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label>Número de Parcelas</label>
+                                    <select class="form-control" name='max_installments'
+                                        id='maxInstallmentsSelect'></select>
+                                </div>
+                                <div class="">
+                                    <label>Permitir parcelamento em:</label>
+                                    <select class="form-control" name='max_installments_type'
+                                        id='typeMaxInstallmentsSelect'>
+                                        <option value=""
+                                            {{ old('max_installments_type') == '' ? 'selected' : '' }}>Máximo de vezes</option>
+                                        {{-- <option value="max"
+                                            {{ old('max_installments_type') == 'max' ? 'selected' : '' }}>1x a <span
+                                                class="maxInstallmentsValue"></span>x</option>
+                                        <option value="min"
+                                            {{ old('max_installments_type') == 'min' ? 'selected' : '' }}>
+                                            <span class="maxInstallmentsValue"></span>x a
+                                            {{ env('CIELO_MAX_INSTALLMENTS', 12) }}x
+                                        </option>
+                                        <option value="exact"
+                                            {{ old('max_installments_type') == 'exact' ? 'selected' : '' }}>Somente em
+                                            <span class="maxInstallmentsValue"></span>x
+                                        </option> --}}
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -207,6 +232,9 @@ $searchQuery = request()->get('search', '');
             });
             const maxInstallments = parseInt("{{ env('CIELO_MAX_INSTALLMENTS', 12) }}");
             const installmentMinValue = parseFloat("{{ env('CIELO_MIN_INSTALLMENT_VALUE', 50) }}");
+            const paymentMaxInstallments = 1;
+            const paymentInitialValue = 0;
+            var availableMaxInstallments = 0;
 
             document.querySelectorAll('.btn-copy').forEach((item) => {
                 item.addEventListener('click', function(evt) {
@@ -263,6 +291,11 @@ $searchQuery = request()->get('search', '');
                 // Pega o valor desmascarado como array de números
                 const unmasked = $('#valueInput').maskMoney('unmasked')[0];
 
+                if (unmasked == 0) {
+                    Message.error('O valor deve ser maior que zero');
+                    e.preventDefault();
+                    return false;
+                }
                 // Substitui no input antes de enviar
                 $('#valueInput').val(unmasked);
             });

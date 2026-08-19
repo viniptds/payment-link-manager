@@ -18,13 +18,18 @@ class DashboardController extends Controller
      */
     public function index(Request $request): View
     {
-        $payments = Payment::select(DB::raw('count(*) as count, sum(value) as sum'))->first();
+        // Totals of the company of the user, everything for the super admin
+        // and the main users.
+        $totals = fn () => Payment::visibleTo($request->user())
+            ->select(DB::raw('count(*) as count, sum(value) as sum'));
 
-        $paid = Payment::select(DB::raw('count(*) as count, sum(value) as sum'))->where('status', Payment::STATUS_PAID)->first();
-        $expired = Payment::select(DB::raw('count(*) as count, sum(value) as sum'))->whereIn('status', [Payment::STATUS_EXPIRED, Payment::STATUS_ACTIVE])->where('expire_at', '<=', date('Y-m-d H:i:s'))->first();
-        $canceled = Payment::select(DB::raw('count(*) as count, sum(value) as sum'))->where('status', Payment::STATUS_CANCELLED)->first();
-        $active = Payment::select(DB::raw('count(*) as count, sum(value) as sum'))->where('status', Payment::STATUS_ACTIVE)->where('expire_at', '>', date('Y-m-d H:i:s'))->first();
-        $inactive = Payment::select(DB::raw('count(*) as count, sum(value) as sum'))->where('status', Payment::STATUS_INACTIVE)->first();
+        $payments = $totals()->first();
+
+        $paid = $totals()->where('status', Payment::STATUS_PAID)->first();
+        $expired = $totals()->whereIn('status', [Payment::STATUS_EXPIRED, Payment::STATUS_ACTIVE])->where('expire_at', '<=', date('Y-m-d H:i:s'))->first();
+        $canceled = $totals()->where('status', Payment::STATUS_CANCELLED)->first();
+        $active = $totals()->where('status', Payment::STATUS_ACTIVE)->where('expire_at', '>', date('Y-m-d H:i:s'))->first();
+        $inactive = $totals()->where('status', Payment::STATUS_INACTIVE)->first();
 
 
         $data = [

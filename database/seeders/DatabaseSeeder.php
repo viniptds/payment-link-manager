@@ -13,6 +13,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $companySeeder = new CompanySeeder;
+        $companySeeder->run();
 
         $adminUser = \App\Models\User::factory()->create([
             'name' => 'Admin User',

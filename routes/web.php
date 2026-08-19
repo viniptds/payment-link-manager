@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PaymentController;
@@ -67,6 +68,14 @@ Route::middleware('auth')->group(function () {
     Route::prefix('customers')->group(function () {
         Route::get('/', [CustomerController::class, 'index'])->name('customers');
         Route::get('/{customer}', [CustomerController::class, 'show'])->name('customers.show');
+    });
+
+    Route::prefix('companies')->middleware('can:manage-companies')->group(function () {
+        Route::get('/', [CompanyController::class, 'index'])->name('companies');
+        Route::post('/', [CompanyController::class, 'store'])->name('companies.store');
+        Route::get('/{company}', [CompanyController::class, 'show'])->name('companies.show');
+        Route::patch('/{company}', [CompanyController::class, 'update'])->name('companies.update');
+        Route::get('/{company}/delete', [CompanyController::class, 'destroy'])->name('companies.destroy');
     });
 
     Route::prefix('settings')->group(function () {

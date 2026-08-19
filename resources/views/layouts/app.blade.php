@@ -32,7 +32,7 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" type="text/javascript"></script>
-    <script src="util/maskMoney.min.js" type="text/javascript"></script>
+    <script src="{{ url('util/maskMoney.min.js') }}" type="text/javascript"></script>
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -69,7 +69,20 @@
 {{-- <script type="text/javascript" src="../node_modules/tw-elements/dist/js/tw-elements.umd.min.js"></script> --}}
 <script>
     const baseURL = "{{ env('APP_URL') }}";
+    document.addEventListener("DOMContentLoaded", function() {
+        $(function() {
+            $('.money-mask').maskMoney({
+                prefix: 'R$ ',
+                allowNegative: false,
+                thousands: '.',
+                decimal: ',',
+                affixesStay: true,
+                precision: 2
+            });
+        })
+    });
 </script>
+
 @yield('js')
 
 </html>

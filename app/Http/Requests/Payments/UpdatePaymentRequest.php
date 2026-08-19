@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Payments;
 
+use App\Models\Payment;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdatePaymentRequest extends FormRequest
@@ -27,7 +28,10 @@ class UpdatePaymentRequest extends FormRequest
             'description' => 'required|string|min:1|max:100',
             'expire_at' => 'nullable|date|after_or_equal:now',
             'max_installments' => 'nullable|numeric|gt:0',
+            'max_installments_type' => 'nullable|string|in:' . implode(',', Payment::INSTALLMENT_TYPES),
+            // 'status' => 'nullable|in:active,inactive',
             // 'max_installments' => 'nullable|numeric|gt:0|lte:' . env('CIELO_MAX_INSTALLMENTS', 12),
+            
             'gateway_ids' => 'nullable|array',
             'gateway_ids.*' => 'nullable|exists:gateways,id',
             'customer_id' => 'nullable|exists:customers'

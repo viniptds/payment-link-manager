@@ -6,13 +6,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Traits\BelongsToCompany;
 use App\Traits\UUID;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Payment extends Model
 {
-    use HasFactory, UUID;
+    use HasFactory, UUID, BelongsToCompany;
 
     const STATUS_ACTIVE = 'active';
     const STATUS_INACTIVE = 'inactive';
@@ -22,7 +23,17 @@ class Payment extends Model
     const STATUS_PENDING = 'pending';
 
     protected $fillable = [
-        'id', 'value', 'description', 'status', 'max_installments', 'created_by', 'expire_at', 'cancelled_at', 'paid_at'
+        'id', 'value', 'description', 'status', 'max_installments', 'created_by', 'expire_at', 'cancelled_at', 'paid_at', 'max_installments_type', 'company_id'
+    ];
+
+    const INSTALLMENT_TYPE_EXACT = 'exact';
+    const INSTALLMENT_TYPE_MIN = 'min';
+    const INSTALLMENT_TYPE_MAX = 'max';
+    
+    const INSTALLMENT_TYPES = [
+        self::INSTALLMENT_TYPE_EXACT,
+        self::INSTALLMENT_TYPE_MIN,
+        self::INSTALLMENT_TYPE_MAX
     ];
 
     public function customer(): BelongsTo

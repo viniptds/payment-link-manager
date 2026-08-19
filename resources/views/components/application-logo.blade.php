@@ -1,1 +1,1 @@
-<img src="{{ asset('storage/assets/' . config('settings.logo_main', '')) }}" class="{{ $class }} center mask-cover" />
+<img src="{{ config('settings.logo_url') }}" class="{{ $class }} center mask-cover" />

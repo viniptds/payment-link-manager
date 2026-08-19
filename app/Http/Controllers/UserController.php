@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Company;
 use App\Models\User;
 use Illuminate\Validation\Rules;
 use Illuminate\Support\Facades\Hash;
@@ -13,7 +14,7 @@ class UserController extends Controller
     {
         $users = [];
         if ($request->user()->is_admin) {
-            $users = User::select()->orderByDesc('created_at')->paginate(15);
+            $users = User::visibleTo($request->user())->orderByDesc('created_at')->paginate(15);
         }
 
         return view('users.index', [
@@ -37,7 +38,8 @@ class UserController extends Controller
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
-                'is_admin' => $request->is_admin == 1 ? true : false
+                'is_admin' => $request->is_admin == 1 ? true : false,
+                'company_id' => $request->user()->company_id ?? Company::current()?->id
             ]);
             
             return redirect('users');
@@ -48,6 +50,10 @@ class UserController extends Controller
 
     function toggleAdmin(User $user, Request $request)
     {
+        if (!$user->isVisibleTo($request->user())) {
+            abort(403);
+        }
+
         if ($user->id != $request->user()->id) {
             $user->is_admin = !$user->is_admin;
             $user->save();

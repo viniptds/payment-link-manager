@@ -26,6 +26,11 @@
                         {{ __('Users') }}
                     </x-nav-link>
                     @endif
+                    @can('manage-companies')
+                    <x-nav-link :href="route('companies')" :active="request()->routeIs('companies')">
+                        {{ __('Companies') }}
+                    </x-nav-link>
+                    @endcan
 
                 </div>
             </div>
@@ -99,6 +104,11 @@
                 {{ __('Users') }}
             </x-responsive-nav-link>
             @endif
+            @can('manage-companies')
+            <x-responsive-nav-link :href="route('companies')" :active="request()->routeIs('companies')">
+                {{ __('Companies') }}
+            </x-responsive-nav-link>
+            @endcan
         </div>
 
         <!-- Responsive Settings Options -->

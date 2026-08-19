@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\CieloGatewayHelper;
 use App\Http\Requests\Payments\StorePaymentRequest;
 use App\Http\Requests\Payments\UpdatePaymentRequest;
+use App\Models\Company;
 use App\Models\Customer;
 use App\Models\Gateway;
 use App\Models\GatewayOperation;
@@ -12,16 +13,17 @@ use App\Models\Payment;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class PaymentController extends Controller
 {
     public function index(Request $request)
     {
-        $links = Payment::select();
+        $links = Payment::visibleTo($request->user());
 
         if (!$request->user()->is_admin) {
-            $links = Payment::select()->where('created_by', $request->user()->id);
+            $links = $links->where('created_by', $request->user()->id);
         }
 
         if (!empty($request->search)) {
@@ -55,6 +57,8 @@ class PaymentController extends Controller
 
     public function show(Payment $payment)
     {
+        $this->authorizeCompany($payment);
+
         $gateways = Gateway::all();
         $customers = Customer::all();
         $payment->load('gateways');
@@ -75,8 +79,10 @@ class PaymentController extends Controller
         $payment->value = $data['value'];
         $payment->description = $data['description'];
         $payment->max_installments = $data['max_installments'] ?? 1;
+        $payment->max_installments_type = $data['max_installments_type'] ?? Payment::INSTALLMENT_TYPE_MAX;
         $payment->expire_at = $data['expire_at'] ?? null;
         $payment->created_by = $request->user()->id;
+        $payment->company_id = $request->user()->company_id ?? Company::current()?->id;
 
         $payment->status = Payment::STATUS_ACTIVE;
 
@@ -99,6 +105,8 @@ class PaymentController extends Controller
 
     public function update(Payment $payment, UpdatePaymentRequest $request)
     {
+        $this->authorizeCompany($payment);
+
         $data = $request->validated();
         $message = 'O pagamento já foi efetuado. Não é possível editar os dados.';
 
@@ -107,6 +115,7 @@ class PaymentController extends Controller
             $payment->description = $data['description'];
             $payment->expire_at = $data['expire_at'] ?? null;
             $payment->max_installments = $data['max_installments'] ?? 1;
+            $payment->max_installments_type = $data['max_installments_type'] ?? Payment::INSTALLMENT_TYPE_MAX;
 
             if (!empty($data['gateway_ids'])) {
                 $payment->gateways()->sync($data['gateway_ids']);
@@ -120,6 +129,8 @@ class PaymentController extends Controller
 
     public function destroy(Payment $payment)
     {
+        $this->authorizeCompany($payment);
+
         $message = 'O pagamento já foi pago e não pode ser removido';
         if ($payment->status != Payment::STATUS_PAID) {
             $payment->gateways()->detach();
@@ -132,6 +143,8 @@ class PaymentController extends Controller
 
     public function toggleActive(Payment $payment)
     {
+        $this->authorizeCompany($payment);
+
         switch ($payment->status) {
             case Payment::STATUS_PAID:
             case Payment::STATUS_CANCELLED:
@@ -153,6 +166,8 @@ class PaymentController extends Controller
 
     public function markAsPaid(Payment $payment, Request $request)
     {
+        $this->authorizeCompany($payment);
+
         $message = __('The payment is not able to be marked as paid.');
 
         if ($payment->status == Payment::STATUS_ACTIVE) {
@@ -168,6 +183,8 @@ class PaymentController extends Controller
 
     public function void(Payment $payment)
     {
+        $this->authorizeCompany($payment);
+
         $response = [
             'status' => false,
             'code' => 403
@@ -234,5 +251,15 @@ class PaymentController extends Controller
             $response['message'] = 'O pagamento ainda não foi pago para ser cancelado';
         }
         return response($response, $response['code']);
+    }
+
+    /**
+     * Block payments that belong to another company.
+     */
+    private function authorizeCompany(Payment $payment): void
+    {
+        if (!$payment->isVisibleTo(Auth::user())) {
+            abort(403);
+        }
     }
 }

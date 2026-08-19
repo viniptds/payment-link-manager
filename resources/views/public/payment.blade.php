@@ -62,7 +62,7 @@ $page = $_GET['page'] ?? 'home';
                     <h1 class="text-bold text-xl">Resumo do Checkout</h1>
                     <div class="my-4">
                         <label class="label-control">Recebedor</label>
-                        <input class="form-control" readonly value="{{config('settings.app_name')}}">
+                        <input class="form-control" readonly value="{{ config('settings.app_name') }}">
                     </div>
 
                     <div class="my-4">
